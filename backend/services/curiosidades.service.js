@@ -120,8 +120,25 @@ async function buscarOFallar(id) {
   return curiosidad;
 }
 
+async function moderacionActiva() {
+  return typeof Curiosidad.moderacionActiva === 'function' ? Curiosidad.moderacionActiva() : false;
+}
+
+/** Una curiosidad pendiente solo la ven su autor y los administradores. */
+function esVisible(curiosidad, usuario) {
+  if (curiosidad.aprobada !== false) return true;
+  if (!usuario) return false;
+  return esAdministrador(usuario) || Number(curiosidad.creado_por) === usuario.id;
+}
+
+function aPublica(curiosidad) {
+  const json = curiosidad.toJSON();
+  if (json.aprobada === undefined) json.aprobada = true;
+  return json;
+}
+
 class CuriosidadesService {
-  static async listar(query = {}) {
+  static async listar(query = {}, opciones = {}) {
     const page = query.page === undefined ? 1 : aEnteroPositivo(query.page);
     let limit = query.limit === undefined ? LIMITE_POR_DEFECTO : aEnteroPositivo(query.limit);
     if (!page || !limit) throw new AppError('Los parámetros "page" y "limit" deben ser enteros positivos', 400);
@@ -137,9 +154,9 @@ class CuriosidadesService {
       if (query[parametro].trim() !== '') filtros[clave] = query[parametro].trim();
     }
 
-    const { count, rows } = await Curiosidad.listar(filtros);
+    const { count, rows } = await Curiosidad.listar({ ...filtros, estado: opciones.estado || 'aprobadas' });
     return {
-      items: rows.map((fila) => fila.toJSON()),
+      items: rows.map(aPublica),
       meta: { total: count, page, limit, totalPages: Math.ceil(count / limit) },
     };
   }
@@ -151,19 +168,21 @@ class CuriosidadesService {
 
     const curiosidad = await Curiosidad.obtenerAleatoria(filtros);
     if (!curiosidad) throw new AppError('No hay curiosidades disponibles', 404);
-    return curiosidad.toJSON();
+    return aPublica(curiosidad);
   }
 
-  static async obtenerPorId(idCrudo) {
+  static async obtenerPorId(idCrudo, usuario) {
     const curiosidad = await buscarOFallar(leerId(idCrudo));
-    return curiosidad.toJSON();
+    if (!esVisible(curiosidad, usuario)) throw new AppError('Curiosidad no encontrada', 404);
+    return aPublica(curiosidad);
   }
 
   static async crear(body, usuario) {
     const datos = validarCuerpo(body, { parcial: false });
     await verificarReferencias(datos);
-    const nueva = await Curiosidad.crearYObtener({ ...datos, creado_por: usuario.id });
-    return nueva.toJSON();
+    const aprobada = !(await moderacionActiva()) || esAdministrador(usuario);
+    const nueva = await Curiosidad.crearYObtener({ ...datos, creado_por: usuario.id, aprobada });
+    return aPublica(nueva);
   }
 
   static async reemplazar(idCrudo, body, usuario) {
@@ -174,9 +193,11 @@ class CuriosidadesService {
     const datos = validarCuerpo(body, { parcial: false });
     if (datos.region_id === undefined) datos.region_id = null;
     await verificarReferencias(datos);
+    // Si la edita alguien que no es administrador, vuelve a revisión.
+    if (!esAdministrador(usuario)) datos.aprobada = false;
 
     const actualizada = await Curiosidad.actualizarYObtener(actual, datos);
-    return actualizada.toJSON();
+    return aPublica(actualizada);
   }
 
   static async actualizarParcial(idCrudo, body, usuario) {
@@ -189,9 +210,29 @@ class CuriosidadesService {
       throw new AppError('Debes enviar al menos un campo para actualizar: titulo, descripcion, categoria_id o region_id', 400);
     }
     await verificarReferencias(datos);
+    if (!esAdministrador(usuario)) datos.aprobada = false;
 
     const actualizada = await Curiosidad.actualizarYObtener(actual, datos);
-    return actualizada.toJSON();
+    return aPublica(actualizada);
+  }
+
+  /** Lista de curiosidades pendientes de revisión (solo administradores). */
+  static async pendientes(query = {}) {
+    return CuriosidadesService.listar(query, { estado: 'pendientes' });
+  }
+
+  /** Aprueba o devuelve a revisión una curiosidad (solo administradores). */
+  static async moderar(idCrudo, body = {}) {
+    const id = leerId(idCrudo);
+    if (body === null || typeof body !== 'object' || typeof body.aprobada !== 'boolean') {
+      throw new AppError('Datos inválidos', 400, [{ campo: 'aprobada', mensaje: 'aprobada debe ser true o false' }]);
+    }
+    if (!(await moderacionActiva())) {
+      throw new AppError('La moderación no está activada: falta ejecutar docs/sql/001_moderacion_curiosidades.sql en la base', 409);
+    }
+    const actual = await buscarOFallar(id);
+    const actualizada = await Curiosidad.actualizarYObtener(actual, { aprobada: body.aprobada });
+    return aPublica(actualizada);
   }
 
   static async eliminar(idCrudo, usuario) {

@@ -7,6 +7,9 @@ process.env.JWT_EXPIRES_IN = '1h';
 process.env.ADMIN_ROL_ID = '1';
 process.env.USUARIO_ROL_ID = '2';
 process.env.BCRYPT_COSTO = '4';
+process.env.CORREO_TRANSPORTE = 'memoria';
+process.env.CORREO_AVISOS = 'equipo@cafehondureno.hn';
+process.env.SITIO_URL = 'https://cafe.ejemplo.hn';
 for (const k of ['DB_HOST', 'DB_NAME', 'DB_USER', 'DB_PASSWORD']) process.env[k] = process.env[k] || 'prueba';
 
 const { Sequelize } = require('sequelize');

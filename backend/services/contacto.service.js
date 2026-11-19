@@ -1,5 +1,6 @@
 const { MensajeContacto, Usuario } = require('../models');
 const AppError = require('../utils/AppError');
+const Correo = require('./correo.service');
 const { leerId, leerPaginacion, metaPaginacion, leerBooleanoQuery, Validador } = require('../utils/validacion');
 
 const ASUNTOS = ['informacion', 'productos', 'sugerencia', 'otro'];
@@ -10,6 +11,27 @@ async function buscarOFallar(id) {
   const mensaje = await MensajeContacto.findByPk(id, { include: relaciones });
   if (!mensaje) throw new AppError('Mensaje no encontrado', 404);
   return mensaje;
+}
+
+const NOMBRES_ASUNTO = { informacion: 'Información sobre el café', productos: 'Productos', sugerencia: 'Sugerencia', otro: 'Otro motivo' };
+
+/** Avisa por correo al equipo (CORREO_AVISOS) cuando llega un mensaje. Si falla, el mensaje igual queda guardado. */
+async function avisarAlEquipo(datos) {
+  const destino = process.env.CORREO_AVISOS;
+  if (!destino || !Correo.configurado()) return;
+  try {
+    await Correo.enviar({
+      para: destino,
+      responderA: datos.correo,
+      asunto: `Nuevo mensaje de contacto: ${NOMBRES_ASUNTO[datos.asunto] || datos.asunto}`,
+      texto:
+        `Nombre: ${datos.nombre}\nCorreo: ${datos.correo}\nMotivo: ${NOMBRES_ASUNTO[datos.asunto] || datos.asunto}\n\n` +
+        `${datos.mensaje}\n\n` +
+        `Responde a este correo para contestarle directamente, o revisa todos los mensajes en ${Correo.urlSitio()}/admin\n`,
+    });
+  } catch (error) {
+    console.error('[correo] No se pudo enviar el aviso de contacto:', error.message);
+  }
 }
 
 class ContactoService {
@@ -31,6 +53,7 @@ class ContactoService {
     }
 
     const nuevo = await MensajeContacto.create({ ...datos, usuario_id: usuario ? usuario.id : null, leido: false });
+    await avisarAlEquipo(datos);
     return (await buscarOFallar(nuevo.id)).toJSON();
   }
 

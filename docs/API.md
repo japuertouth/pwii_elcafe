@@ -723,3 +723,26 @@ El registro siempre crea usuarios con rol `usuario`, para que nadie pueda regist
 | Pruebas documentadas | `docs/pruebas/` y `npm test` (59 pruebas) |
 | README | `README.md` (arranque del servidor y conexión a la base) |
 | Evidencia de IA | `docs/evidencia_IA/` |
+
+## 9. Novedades: moderación, recuperación de contraseña y avisos por correo
+
+| Módulo | Método | Ruta | Acceso | Códigos |
+|---|---|---|---|---|
+| Autenticación | POST | `/api/auth/recuperar` | Público | 200, 400, 429, 503 |
+| Autenticación | POST | `/api/auth/restablecer` | Público (con enlace) | 200, 400, 429 |
+| Curiosidades | GET | `/api/curiosidades/pendientes` | 🔒 Admin | 200, 400, 401, 403 |
+| Curiosidades | PATCH | `/api/curiosidades/:id/moderacion` | 🔒 Admin | 200, 400, 401, 403, 404, 409 |
+
+### Moderación de curiosidades
+- Requiere la columna `aprobada` (ver `docs/sql/001_moderacion_curiosidades.sql` o `npm run migrar`). Sin ella, la API funciona sin moderación.
+- `POST /api/curiosidades`: si la crea un usuario normal queda con `"aprobada": false` y el mensaje indica que será revisada; si la crea un administrador se publica de inmediato. El campo `aprobada` enviado por el cliente se ignora.
+- `PUT` y `PATCH` hechos por el autor (no administrador) devuelven la curiosidad a revisión.
+- `GET /api/curiosidades`, `/aleatoria` y `/:id` solo muestran las aprobadas. En `/:id`, el autor y los administradores (con token) también ven las pendientes.
+- `PATCH /api/curiosidades/:id/moderacion` con `{ "aprobada": true }` la publica; `false` la devuelve a revisión. Para rechazarla se usa `DELETE`.
+
+### Recuperar contraseña
+1. `POST /api/auth/recuperar` con `{ "correo" }`. Siempre responde lo mismo, exista o no la cuenta. Si existe y está activa, envía por correo un enlace `SITIO_URL/restablecer#token=...` que vence en 30 minutos. Máximo 3 enlaces por correo por hora y 5 solicitudes por IP por hora. Si el SMTP no está configurado responde `503`.
+2. `POST /api/auth/restablecer` con `{ "token", "password_nueva", "confirmar_password"? }`. La contraseña sigue las reglas del registro. El enlace deja de servir en cuanto la contraseña cambia (un solo uso) y las sesiones anteriores se cierran.
+
+### Aviso de contacto
+Cada `POST /api/contacto` envía un correo de solo texto a `CORREO_AVISOS` (si está configurado), con `Reply-To` del visitante. Si el envío falla, el mensaje igual queda guardado.

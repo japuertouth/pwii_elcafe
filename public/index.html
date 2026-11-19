@@ -8,6 +8,22 @@
   <meta name="theme-color" content="#1f3b2d">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <link rel="icon" href="/imagenes/logo.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/imagenes/apple-touch-icon.png">
+  <link rel="canonical" href="https://pwiielcafe.vercel.app/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Café Hondureño">
+  <meta property="og:locale" content="es_HN">
+  <meta property="og:title" content="Café Hondureño | El oro de nuestras montañas">
+  <meta property="og:description" content="Fan page del café hondureño: regiones, historia, datos y cultura del café de Honduras.">
+  <meta property="og:url" content="https://pwiielcafe.vercel.app/">
+  <meta property="og:image" content="https://pwiielcafe.vercel.app/imagenes/og/og-inicio.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Paisaje cafetalero con el título: Café Hondureño | El oro de nuestras montañas">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Café Hondureño | El oro de nuestras montañas">
+  <meta name="twitter:description" content="Fan page del café hondureño: regiones, historia, datos y cultura del café de Honduras.">
+  <meta name="twitter:image" content="https://pwiielcafe.vercel.app/imagenes/og/og-inicio.jpg">
   <link rel="stylesheet" href="/css/estilos.css">
   <script src="/js/tema-inicial.js"></script>
   <script src="/js/comun.js" defer></script>
@@ -43,7 +59,7 @@
         <div>
           <h1 id="titulo-portada">El oro de nuestras montañas</h1>
           <p class="entrada" id="saludo">Bienvenido, amante del café.</p>
-          <p class="entrada">Honduras es el mayor productor de café de Centroamérica y uno de los cinco más grandes del mundo. Detrás de cada taza hay más de 120,000 familias productoras y seis regiones con sabores propios.</p>
+          <p class="entrada">Honduras es el mayor productor de café de Centroamérica y el quinto del mundo. Detrás de cada taza hay casi 97,000 productores y seis regiones con sabores propios.</p>
           <div class="botones">
             <a class="boton" href="/elcafe">Conoce el café</a>
             <a class="boton boton--contorno" href="#regiones">Ver las regiones</a>
@@ -62,11 +78,15 @@
       <p class="portada__credito">Foto: <a href="https://commons.wikimedia.org/wiki/File:Coffee_plantations_on_the_Camino_de_Costa_Rica.jpg" rel="noopener noreferrer" target="_blank">Cafetales en el Camino de Costa Rica</a>, Pigment-Ink, <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.es" rel="noopener noreferrer" target="_blank">CC BY-SA 4.0</a></p>
     </section>
 
-    <section class="cifras" aria-label="El café hondureño en cifras">
-      <div class="cifra"><p class="cifra__valor">5.º</p><p>productor de café del mundo</p></div>
-      <div class="cifra"><p class="cifra__valor">120,000</p><p>familias productoras, 90 % pequeños caficultores</p></div>
-      <div class="cifra"><p class="cifra__valor">6.1 M</p><p>quintales exportados en la cosecha 2024-2025</p></div>
-      <div class="cifra"><p class="cifra__valor">US$2,100 M</p><p>en divisas generadas en 2024-2025</p></div>
+    <section class="cifras-bloque" aria-labelledby="titulo-cifras">
+      <h2 class="sr-only" id="titulo-cifras">El café hondureño en cifras</h2>
+      <div class="cifras">
+        <div class="cifra"><p class="cifra__valor">5.º</p><p>productor de café del mundo y 1.º de Centroamérica</p></div>
+        <div class="cifra"><p class="cifra__valor">96,903</p><p>productores registrados en el Ihcafé</p></div>
+        <div class="cifra"><p class="cifra__valor">7.3 M</p><p>quintales exportados, récord histórico</p></div>
+        <div class="cifra"><p class="cifra__valor">US$2,285 M</p><p>en divisas, la mayor cifra registrada</p></div>
+      </div>
+      <p class="cifras__fuente contenedor">Cosecha 2025-2026, cerrada el 30 de septiembre de 2026. Fuente: Instituto Hondureño del Café (Ihcafé), vía EFE.</p>
     </section>
 
     <section class="seccion" aria-labelledby="titulo-sobre">
@@ -111,7 +131,9 @@
           <li class="hito"><span class="hito__fecha">1970</span><p>Se crea el Instituto Hondureño del Café (IHCAFE) para impulsar y organizar la caficultura nacional.</p></li>
           <li class="hito"><span class="hito__fecha">2005</span><p>El café de Marcala obtiene la primera Denominación de Origen para café de Centroamérica.</p></li>
           <li class="hito"><span class="hito__fecha">2011</span><p>Honduras supera a Guatemala y se convierte en el mayor productor de café de Centroamérica.</p></li>
-          <li class="hito"><span class="hito__fecha">2024-2025</span><p>Se exportan 6.1 millones de quintales y se superan los US$2,100 millones en divisas, una cosecha histórica.</p></li>
+          <li class="hito"><span class="hito__fecha">2024-2025</span><p>Se exportan 6.1 millones de quintales y se superan por primera vez los US$2,100 millones en divisas.</p></li>
+          <li class="hito"><span class="hito__fecha">2025-2026</span><p>Nuevo récord: 7.3 millones de quintales exportados y US$2,285 millones en divisas.</p></li>
+          <li class="hito"><span class="hito__fecha">2026-2027</span><p>Arranca la cosecha actual; el Ihcafé pronostica exportar unos 7 millones de quintales.</p></li>
         </ol>
       </div>
     </section>
@@ -183,8 +205,8 @@
           <h2>Fuentes</h2>
           <ul>
             <li><a href="https://www.ihcafe.hn" rel="noopener noreferrer" target="_blank">Instituto Hondureño del Café (IHCAFE)</a></li>
-            <li><a href="https://www.laprensa.hn/economia/honduras-inicia-cosecha-de-cafe-2025-2026-con-meta-de-exportar-65-millones-de-quintales-CJ27599748" rel="noopener noreferrer" target="_blank">La Prensa: cosecha 2025-2026</a></li>
-            <li><a href="https://www.abc.com.py/internacionales/2025/07/14/las-exportaciones-de-cafe-hondureno-crecen-un-3-en-la-cosecha-2024-2025/" rel="noopener noreferrer" target="_blank">EFE / ABC: exportaciones 2024-2025</a></li>
+            <li><a href="https://forbescentroamerica.com/2026/10/01/cafe-hondureno-genera-en-la-ultima-cosecha-2285-mdd" rel="noopener noreferrer" target="_blank">EFE / Forbes: cierre de la cosecha 2025-2026</a></li>
+            <li><a href="https://laprensa.hn/economia/cafetaleros-hondurenos-preven-menos-exportacion-precio-cafe-AD32316688" rel="noopener noreferrer" target="_blank">La Prensa: pronóstico 2026-2027</a></li>
             <li><a href="https://perfectdailygrind.com/es/2024/07/12/recorrido-zonas-productoras-cafe-honduras/" rel="noopener noreferrer" target="_blank">Perfect Daily Grind: zonas productoras</a></li>
             <li><a href="https://commons.wikimedia.org/wiki/Category:Coffee_in_Honduras" rel="noopener noreferrer" target="_blank">Fotografías: Wikimedia Commons</a></li>
           </ul>

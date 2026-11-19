@@ -48,6 +48,53 @@ function verificarFirma(token) {
   });
 }
 
+/* ---------- Enlace para restablecer la contraseña ----------
+   Token firmado de un solo uso: lleva la huella de la contraseña actual, así que deja de
+   servir en cuanto la contraseña cambia. Vence a los 30 minutos. */
+const AUDIENCIA_RESTABLECER = 'cafe-hondureno-restablecer';
+
+function firmarTokenRestablecer(usuario) {
+  return jwt.sign({ ver: huellaPassword(usuario.password_hash) }, exigirSecreto(), {
+    algorithm: 'HS256',
+    expiresIn: '30m',
+    issuer: config.jwt.emisor,
+    audience: AUDIENCIA_RESTABLECER,
+    subject: String(usuario.id),
+    jwtid: crypto.randomUUID(),
+  });
+}
+
+function verificarTokenRestablecer(token) {
+  try {
+    return jwt.verify(String(token || ''), exigirSecreto(), {
+      algorithms: ['HS256'],
+      issuer: config.jwt.emisor,
+      audience: AUDIENCIA_RESTABLECER,
+    });
+  } catch (error) {
+    if (error instanceof AppError) throw error;
+    throw new AppError(
+      error.name === 'TokenExpiredError'
+        ? 'El enlace venció. Pide uno nuevo desde "¿Olvidaste tu contraseña?"'
+        : 'El enlace no es válido. Pide uno nuevo desde "¿Olvidaste tu contraseña?"',
+      400
+    );
+  }
+}
+
+/* Límite de correos de recuperación por dirección (evita llenar el buzón de alguien). */
+const solicitudes = new Map();
+function permitirSolicitud(correo, { maximo = 3, minutos = 60 } = {}) {
+  const clave = claveIntento(correo);
+  const ahora = Date.now();
+  const lista = (solicitudes.get(clave) || []).filter((t) => t > ahora - minutos * 60000);
+  if (lista.length >= maximo) return false;
+  lista.push(ahora);
+  solicitudes.set(clave, lista);
+  if (solicitudes.size > 10000) solicitudes.clear();
+  return true;
+}
+
 /* ---------- Revocación (logout) ----------
    Lista en memoria de tokens cerrados hasta que expiran. En Vercel cada instancia
    tiene su propia memoria, por eso el token también caduca a las pocas horas. */
@@ -143,8 +190,12 @@ module.exports = {
   registrarFallo,
   limpiarFallos,
   compararPassword,
+  firmarTokenRestablecer,
+  verificarTokenRestablecer,
+  permitirSolicitud,
   _reiniciar() {
     revocados.clear();
     intentos.clear();
+    solicitudes.clear();
   },
 };

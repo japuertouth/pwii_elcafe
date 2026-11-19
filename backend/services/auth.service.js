@@ -5,6 +5,7 @@ const config = require('../config/env');
 const Reglas = require('../utils/reglas');
 const { Validador } = require('../utils/validacion');
 const seguridad = require('../utils/seguridad');
+const Correo = require('./correo.service');
 
 function aPublico(usuario) {
   const u = usuario.toJSON ? usuario.toJSON() : usuario;
@@ -164,6 +165,66 @@ class AuthService {
     return { id: usuario.id, ...respuestaConToken(actualizado) };
   }
 }
+
+const MENSAJE_RECUPERAR =
+  'Si el correo está registrado, te enviamos un enlace para crear una contraseña nueva. Revisa también la carpeta de spam.';
+
+/** Pide un enlace para restablecer la contraseña. La respuesta es la misma exista o no la cuenta. */
+AuthService.solicitarRestablecimiento = async function (body) {
+  const v = new Validador(body);
+  const correo = typeof body.correo === 'string' ? Reglas.limpiarLinea(body.correo).toLowerCase() : '';
+  if (!correo || correo.length > Reglas.CORREO_MAX) v.error('correo', 'Escribe el correo de tu cuenta');
+  v.resultado();
+
+  if (!Correo.configurado()) {
+    throw new AppError('El envío de correos no está configurado. Pide al administrador que restablezca tu contraseña.', 503);
+  }
+  if (!seguridad.permitirSolicitud(correo)) return { mensaje: MENSAJE_RECUPERAR };
+
+  const usuario = await Usuario.findOne({ where: { correo } });
+  if (usuario && usuario.activo) {
+    const enlace = `${Correo.urlSitio()}/restablecer#token=${seguridad.firmarTokenRestablecer(usuario)}`;
+    try {
+      await Correo.enviar({
+        para: usuario.correo,
+        asunto: 'Crea una contraseña nueva para Café Hondureño',
+        texto:
+          `Hola, ${usuario.nombre}:\n\n` +
+          'Recibimos una solicitud para cambiar la contraseña de tu cuenta en Café Hondureño.\n' +
+          `Abre este enlace para crear una nueva (vence en 30 minutos y solo se puede usar una vez):\n\n${enlace}\n\n` +
+          'Si no fuiste tú, ignora este correo: tu contraseña no cambiará.\n',
+      });
+    } catch (error) {
+      console.error('[correo] No se pudo enviar el enlace de recuperación:', error.message);
+      throw new AppError('No se pudo enviar el correo en este momento. Intenta de nuevo en unos minutos.', 503);
+    }
+  }
+  return { mensaje: MENSAJE_RECUPERAR };
+};
+
+/** Cambia la contraseña con el enlace recibido por correo. */
+AuthService.restablecerPassword = async function (body) {
+  const v = new Validador(body);
+  if (typeof body.token !== 'string' || body.token.length === 0 || body.token.length > 2048) v.error('token', 'Falta el enlace de recuperación');
+  v.resultado();
+
+  const payload = seguridad.verificarTokenRestablecer(body.token);
+  const usuario = await Usuario.findByPk(Number(payload.sub));
+  if (!usuario || !usuario.activo || payload.ver !== seguridad.huellaPassword(usuario.password_hash)) {
+    throw new AppError('El enlace ya se usó o no es válido. Pide uno nuevo desde "¿Olvidaste tu contraseña?"', 400);
+  }
+
+  const v2 = new Validador(body);
+  validarPassword(body.password_nueva, 'password_nueva', v2, { nombre: usuario.nombre, correo: usuario.correo });
+  if (body.confirmar_password !== undefined && body.confirmar_password !== body.password_nueva) {
+    v2.error('confirmar_password', 'Las contraseñas no coinciden');
+  }
+  v2.resultado();
+
+  await usuario.update({ password_hash: await hashear(body.password_nueva) });
+  seguridad.limpiarFallos(usuario.correo);
+  return { mensaje: 'Contraseña actualizada. Ya puedes iniciar sesión con la nueva.' };
+};
 
 AuthService.aPublico = aPublico;
 module.exports = AuthService;

@@ -156,13 +156,13 @@
   /* ---------- Dato curioso (API con respaldo local) ---------- */
   var DATOS = [
     'Honduras es el mayor productor de café de Centroamérica y el quinto del mundo.',
-    'Unos 120,000 productores cultivan café en Honduras, y el 90 % son pequeños productores.',
-    'La cosecha de café genera cerca de un millón de empleos en corte, procesamiento y transporte.',
+    'En la cosecha 2025-2026 Honduras exportó 7.3 millones de quintales: un récord histórico.',
+    'El café dejó US$2,285 millones en divisas en la cosecha 2025-2026, la cifra más alta registrada.',
+    'Casi 97,000 productores de café están registrados en el Instituto Hondureño del Café.',
+    'La cosecha 2025-2026 se vendió a 53 países.',
     'El café de Marcala fue el primero de Centroamérica con Denominación de Origen.',
     'La cosecha cafetalera inicia cada 1 de octubre, Día Nacional de la Caficultura.',
-    'En la cosecha 2024-2025 el precio promedio de exportación rondó los US$360 por quintal de 46 kg.',
-    'El café es la principal fuente de divisas por exportaciones de Honduras.',
-    'La meta de exportación para la cosecha 2025-2026 es de 6.5 millones de quintales.',
+    'Para la cosecha 2026-2027 el Ihcafé pronostica exportar unos 7 millones de quintales.',
   ];
   var texto = document.getElementById('textoDato');
   var ultimo = 0;

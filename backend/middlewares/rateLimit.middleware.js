@@ -47,7 +47,13 @@ const limiteContacto = crearLimite({
   mensaje: 'Ya enviaste varios mensajes. Espera unos minutos antes de enviar otro.',
 });
 
+const limiteRecuperar = crearLimite({
+  minutos: 60,
+  maximo: 5,
+  mensaje: 'Ya pediste varios enlaces de recuperación. Espera una hora antes de pedir otro.',
+});
+
 // Se mantiene el nombre anterior por compatibilidad.
 const limiteAuth = limiteLogin;
 
-module.exports = { limiteGeneral, limiteLogin, limiteRegistro, limiteSensible, limiteContacto, limiteAuth };
+module.exports = { limiteGeneral, limiteLogin, limiteRegistro, limiteSensible, limiteContacto, limiteRecuperar, limiteAuth };

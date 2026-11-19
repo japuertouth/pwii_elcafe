@@ -14,6 +14,7 @@
     "test": "node --test \"backend/tests/**/*.test.js\"",
     "rutas": "node backend/scripts/listar-rutas.js",
     "verificar:azure": "node backend/scripts/verificar-azure.js",
+    "migrar": "node backend/scripts/migrar.js",
     "crear:admin": "node backend/scripts/crear-admin.js",
     "restablecer:password": "node backend/scripts/restablecer-password.js",
     "auditoria": "npm audit --omit=dev"
@@ -26,6 +27,7 @@
     "express-rate-limit": "^7.4.0",
     "helmet": "^8.0.0",
     "jsonwebtoken": "^9.0.2",
+    "nodemailer": "^10.6.0",
     "sequelize": "^6.37.7",
     "tedious": "^18.6.1"
   },

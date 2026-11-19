@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /admin
+Disallow: /cuenta
+Disallow: /restablecer
+
+Sitemap: https://pwiielcafe.vercel.app/sitemap.xml

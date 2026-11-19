@@ -19,3 +19,6 @@ portada-curiosidades.jpg  -> File:El_Águila_(5),_Valle,_Colombia.JPG — Hoako,
 portada-contacto.jpg      -> File:Countryside_near_Palma_Real,_a_village_(aldea)_in_the_municipality_of_Proteccion.jpg — Catrachos, CC BY-SA 3.0 (Santa Bárbara, Honduras)
 portada-cuenta.jpg        -> File:Coffee_shadow_trees_costa_rica.jpg — DirkvdM, CC BY 1.0
 portada-404.jpg           -> File:El_Águila_(26),_Valle,_Colombia.JPG — Hoako, CC BY-SA 3.0
+
+og/ (imágenes de vista previa para redes sociales, 1200x630) y portadas/*.webp:
+se generaron a partir de las mismas fotos de portadas/, con su misma licencia y autor.

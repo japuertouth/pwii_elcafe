@@ -8,6 +8,22 @@
   <meta name="theme-color" content="#1f3b2d">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <link rel="icon" href="/imagenes/logo.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/imagenes/apple-touch-icon.png">
+  <meta name="robots" content="noindex, nofollow">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Café Hondureño">
+  <meta property="og:locale" content="es_HN">
+  <meta property="og:title" content="Mi cuenta | Café Hondureño">
+  <meta property="og:description" content="Inicia sesión o crea tu cuenta en Café Hondureño para compartir curiosidades.">
+  <meta property="og:url" content="https://pwiielcafe.vercel.app/cuenta">
+  <meta property="og:image" content="https://pwiielcafe.vercel.app/imagenes/og/og-cuenta.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Paisaje cafetalero con el título: Mi cuenta | Café Hondureño">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Mi cuenta | Café Hondureño">
+  <meta name="twitter:description" content="Inicia sesión o crea tu cuenta en Café Hondureño para compartir curiosidades.">
+  <meta name="twitter:image" content="https://pwiielcafe.vercel.app/imagenes/og/og-cuenta.jpg">
   <link rel="stylesheet" href="/css/estilos.css">
   <script src="/js/tema-inicial.js"></script>
   <script src="/js/comun.js" defer></script>
@@ -76,8 +92,20 @@
               <div class="clave"><input type="password" id="login-password" autocomplete="current-password" maxlength="256" required aria-describedby="error-login-password"><button type="button" class="ver-clave" aria-pressed="false">Mostrar</button></div>
               <p class="error" id="error-login-password"></p>
             </div>
-            <div><button class="boton" type="submit">Iniciar sesión</button></div>
+            <div class="acciones-form"><button class="boton" type="submit">Iniciar sesión</button><button class="enlace-boton" type="button" id="botonOlvide">¿Olvidaste tu contraseña?</button></div>
             <p class="aviso" id="avisoLogin" role="status"></p>
+          </form>
+
+          <form class="formulario" id="formRecuperar" novalidate hidden aria-labelledby="titulo-recuperar">
+            <h2 id="titulo-recuperar" class="titulo-panel">Recupera tu contraseña</h2>
+            <p>Escribe el correo de tu cuenta y te enviaremos un enlace para crear una contraseña nueva. El enlace vence en 30 minutos.</p>
+            <div class="campo">
+              <label for="rec-correo">Correo electrónico</label>
+              <input type="email" id="rec-correo" autocomplete="email" inputmode="email" maxlength="254" required aria-describedby="error-rec-correo">
+              <p class="error" id="error-rec-correo"></p>
+            </div>
+            <div class="acciones-form"><button class="boton" type="submit">Enviar enlace</button><button class="enlace-boton" type="button" id="botonVolverLogin">Volver a iniciar sesión</button></div>
+            <p class="aviso" id="avisoRecuperar" role="status"></p>
           </form>
 
           <form class="formulario" id="formRegistro" role="tabpanel" aria-labelledby="tab-registro" novalidate hidden>
@@ -120,6 +148,7 @@
             <dt>Miembro desde</dt><dd id="perfilFecha"></dd>
           </dl>
           <p class="aviso" id="avisoPerfil" role="status"></p>
+          <p id="enlaceAdmin" hidden><a class="boton" href="/admin">Abrir el panel de administración</a></p>
 
           <details>
             <summary>Compartir una curiosidad</summary>
@@ -190,8 +219,8 @@
           <h2>Fuentes</h2>
           <ul>
             <li><a href="https://www.ihcafe.hn" rel="noopener noreferrer" target="_blank">Instituto Hondureño del Café (IHCAFE)</a></li>
-            <li><a href="https://www.laprensa.hn/economia/honduras-inicia-cosecha-de-cafe-2025-2026-con-meta-de-exportar-65-millones-de-quintales-CJ27599748" rel="noopener noreferrer" target="_blank">La Prensa: cosecha 2025-2026</a></li>
-            <li><a href="https://www.abc.com.py/internacionales/2025/07/14/las-exportaciones-de-cafe-hondureno-crecen-un-3-en-la-cosecha-2024-2025/" rel="noopener noreferrer" target="_blank">EFE / ABC: exportaciones 2024-2025</a></li>
+            <li><a href="https://forbescentroamerica.com/2026/10/01/cafe-hondureno-genera-en-la-ultima-cosecha-2285-mdd" rel="noopener noreferrer" target="_blank">EFE / Forbes: cierre de la cosecha 2025-2026</a></li>
+            <li><a href="https://laprensa.hn/economia/cafetaleros-hondurenos-preven-menos-exportacion-precio-cafe-AD32316688" rel="noopener noreferrer" target="_blank">La Prensa: pronóstico 2026-2027</a></li>
             <li><a href="https://perfectdailygrind.com/es/2024/07/12/recorrido-zonas-productoras-cafe-honduras/" rel="noopener noreferrer" target="_blank">Perfect Daily Grind: zonas productoras</a></li>
             <li><a href="https://commons.wikimedia.org/wiki/Category:Coffee_in_Honduras" rel="noopener noreferrer" target="_blank">Fotografías: Wikimedia Commons</a></li>
           </ul>

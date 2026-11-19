@@ -5,7 +5,8 @@ Proyecto unificado de Programación Web II: la **fan page** (HTML, CSS y JavaScr
 ```
 cafe-hondureno/
 ├── public/            Fan page (lo que Vercel sirve como sitio estático)
-│   ├── index.html, elcafe.html, galeria.html, curiosidades.html, contacto.html, cuenta.html, 404.html
+│   ├── index.html, elcafe.html, galeria.html, curiosidades.html, contacto.html, cuenta.html,
+│   │   restablecer.html, admin.html, 404.html, robots.txt, sitemap.xml
 │   ├── css/estilos.css      Una sola hoja de estilos para todo el sitio
 │   ├── js/                  comun.js (tema, menú, sesión, API) + un archivo por página
 │   ├── js/reglas.js         Reglas de validación compartidas con la API
@@ -98,20 +99,48 @@ Las reglas están en `public/js/reglas.js` y las usan **el formulario y la API**
 - El frontend nunca inserta HTML recibido de la API (usa `textContent`) y solo acepta imágenes `https:` o del propio sitio.
 - Formularios con **campo trampa** (honeypot) contra robots; el mensaje de contacto admite como máximo 2 enlaces.
 - Tipografías alojadas en el propio sitio: no se envía información de los visitantes a terceros.
+- Recuperación de contraseña con enlace firmado de un solo uso (vence en 30 min); el token viaja después del `#`, así no queda en registros del servidor.
+- Correos solo de texto (sin HTML) y con remitente fijo; los enlaces usan `SITIO_URL`, nunca el dominio que envía el navegador.
+- El panel de administración construye todo con `textContent` y la API comprueba el rol en cada petición.
 
 > **Importante:** el README anterior del backend tenía el usuario y la contraseña reales de Azure SQL. Ese archivo ya circuló, así que **cambien la contraseña de la base** en Azure y usen la nueva solo en `.env` y en Vercel.
 
-## 5. Pruebas
+## 5. Funciones de administración
+
+### Primer administrador
+Regístrate en `/cuenta` y luego, con el `.env` configurado: `npm run crear:admin -- tu@correo.com`. Vuelve a iniciar sesión: en **Mi cuenta** aparece el botón **Abrir el panel de administración** (`/admin`).
+
+### Panel de administración (`/admin`)
+- **Mensajes:** los mensajes de contacto, con filtro de "sin leer", marcar como leído, responder por correo y eliminar.
+- **Curiosidades:** las que envían los usuarios quedan **pendientes** hasta que un administrador las aprueba; si se rechazan, se eliminan. Si el autor edita una curiosidad publicada, vuelve a revisión. Las del administrador se publican de inmediato.
+- **Galería:** agregar fotos con una dirección `https://` o una ruta del sitio (`/imagenes/...`) y eliminarlas. Vercel no guarda archivos subidos, por eso se usa una dirección. Usen solo fotos propias o con licencia libre y pongan el crédito en la descripción.
+- **Regiones:** editar departamentos, altura, perfil de taza y descripción que se muestran en el inicio.
+
+### Activar la moderación en Azure (una sola vez)
+La moderación necesita la columna `aprobada` en la tabla `curiosidades`. Ejecuten `docs/sql/001_moderacion_curiosidades.sql` en el **Query editor** de la base en el portal de Azure, o `npm run migrar` desde el proyecto. Mientras no exista la columna, la API sigue funcionando sin moderación (las curiosidades se publican al instante) y lo avisa en los registros.
+
+### Correo: recuperar contraseña y avisos de contacto
+No usa servicios externos nuevos: envía por **SMTP con una cuenta de correo que ya tengan** (Gmail, Outlook o el correo institucional). Configuren en `.env` y en Vercel: `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `CORREO_REMITENTE` y `CORREO_AVISOS` (ver `.env.example`). Con Gmail, `SMTP_PASS` es una *contraseña de aplicación* (requiere la verificación en 2 pasos), nunca la contraseña normal.
+
+- **"¿Olvidaste tu contraseña?"** (en `/cuenta`) envía un enlace a `/restablecer` que vence en 30 minutos y solo sirve una vez. La respuesta es la misma exista o no la cuenta, y cada correo puede pedir como máximo 3 enlaces por hora.
+- **Aviso de contacto:** cada mensaje nuevo llega a `CORREO_AVISOS`; al responder ese correo se le contesta directamente a quien escribió.
+
+Si el SMTP no está configurado, todo lo demás funciona y "¿Olvidaste tu contraseña?" responde que el envío de correos no está disponible.
+
+### Vista previa al compartir y buscadores
+Cada página tiene etiquetas Open Graph con una imagen de 1200×630 (`public/imagenes/og/`), además de `robots.txt` y `sitemap.xml`. Usan la dirección `https://pwiielcafe.vercel.app`; si cambian de dominio, reemplácenla en esos archivos y en las etiquetas `og:` de las páginas.
+
+## 6. Pruebas
 
 ```bash
-npm test          # 59 pruebas: API completa (SQLite en memoria), seguridad y configuración de despliegue
+npm test          # 62 pruebas: API completa (SQLite en memoria), seguridad, moderación, correo y despliegue
 npm run rutas     # lista de rutas públicas y privadas
 npm run auditoria # vulnerabilidades conocidas en dependencias de producción (hoy: 0)
 ```
 
 La documentación de cada endpoint está en `docs/API.md` y la colección de Postman en `docs/pruebas/`.
 
-## 6. Equipo
+## 7. Equipo
 
 Josue Alejandro Puerto Ulloa · Eduardo Alberto Meza · Nathaly Melissa Aguilar Gómez · Josse Armando Galeano · José Daniel Muñoz Cruz
 

@@ -274,28 +274,61 @@ test('Regiones: lectura pública y CRUD de admin', async () => {
   estructura(await api('DELETE', '/api/regiones/999', { token: t.admin }), 404);
 });
 
-test('Curiosidades: CRUD completo con el token del login (compatibilidad con la Parte CRUD)', async () => {
+test('Curiosidades: CRUD completo; la de un usuario queda pendiente hasta que un admin la aprueba', async () => {
   estructura(await api('POST', '/api/curiosidades', { body: { titulo: 'x', descripcion: 'y', categoria_id: 1 } }), 401);
   const c = await api('POST', '/api/curiosidades', {
     token: t.usuario,
-    body: { titulo: 'Marcala hizo historia', descripcion: 'Primera denominación de origen de café en Centroamérica.', categoria_id: 1, region_id: 2 },
+    body: { titulo: 'Marcala hizo historia', descripcion: 'Primera denominación de origen de café en Centroamérica.', categoria_id: 1, region_id: 2, aprobada: true },
   });
   estructura(c, 201);
   assert.equal(c.json.data.creado_por, 2);
   assert.equal(c.json.data.autor.nombre, 'María López');
+  assert.equal(c.json.data.aprobada, false, 'un usuario normal no puede autoaprobarse');
+  assert.match(c.json.message, /revisará/);
   const id = c.json.data.id;
+
+  // Pendiente: no aparece en público; solo la ven su autor y el admin.
+  assert.ok(!(await api('GET', '/api/curiosidades?q=Marcala')).json.data.some((x) => x.id === id));
+  estructura(await api('GET', `/api/curiosidades/${id}`), 404);
+  estructura(await api('GET', `/api/curiosidades/${id}`, { token: t.usuario }), 200);
+  estructura(await api('GET', `/api/curiosidades/${id}`, { token: t.admin }), 200);
+
+  // Moderación: solo admin.
+  estructura(await api('GET', '/api/curiosidades/pendientes', { token: t.usuario }), 403);
+  const pend = await api('GET', '/api/curiosidades/pendientes', { token: t.admin });
+  estructura(pend, 200);
+  assert.ok(pend.json.data.some((x) => x.id === id));
+  estructura(await api('PATCH', `/api/curiosidades/${id}/moderacion`, { token: t.usuario, body: { aprobada: true } }), 403);
+  estructura(await api('PATCH', `/api/curiosidades/${id}/moderacion`, { token: t.admin, body: { aprobada: 'si' } }), 400);
+  const ok = await api('PATCH', `/api/curiosidades/${id}/moderacion`, { token: t.admin, body: { aprobada: true } });
+  estructura(ok, 200);
+  assert.equal(ok.json.data.aprobada, true);
 
   const lista = await api('GET', '/api/curiosidades?q=Marcala');
   estructura(lista, 200);
   assert.ok(lista.json.data.some((x) => x.id === id));
   estructura(await api('GET', `/api/curiosidades/${id}`), 200);
-  estructura(await api('PATCH', `/api/curiosidades/${id}`, { token: t.usuario, body: { titulo: 'Marcala, D.O.' } }), 200);
+
+  // Si el autor la edita, vuelve a revisión.
+  const editada = await api('PATCH', `/api/curiosidades/${id}`, { token: t.usuario, body: { titulo: 'Marcala, D.O.' } });
+  estructura(editada, 200);
+  assert.equal(editada.json.data.aprobada, false);
+  estructura(await api('GET', `/api/curiosidades/${id}`), 404);
   estructura(await api('PUT', `/api/curiosidades/${id}`, { token: t.usuario, body: { titulo: 'Marcala', descripcion: 'Texto nuevo', categoria_id: 2 } }), 200);
   estructura(await api('POST', '/api/curiosidades', { token: t.usuario, body: { titulo: 'x', descripcion: 'y', categoria_id: 3 } }), 400);
   const otro = (await api('POST', '/api/auth/registro', { body: { nombre: 'Ana', correo: 'ana@correo.com', password: 'Cereza#Roja2026' } })).json.data.token;
+  estructura(await api('GET', `/api/curiosidades/${id}`, { token: otro }), 404);
   estructura(await api('DELETE', `/api/curiosidades/${id}`, { token: otro }), 403);
   estructura(await api('DELETE', `/api/curiosidades/${id}`, { token: t.admin }), 200);
-  estructura(await api('GET', `/api/curiosidades/${id}`), 404);
+  estructura(await api('GET', `/api/curiosidades/${id}`, { token: t.admin }), 404);
+});
+
+test('Curiosidades: las del administrador se publican de inmediato', async () => {
+  const c = await api('POST', '/api/curiosidades', { token: t.admin, body: { titulo: 'Café de altura', descripcion: 'Crece entre 1,000 y 1,700 msnm.', categoria_id: 1 } });
+  estructura(c, 201);
+  assert.equal(c.json.data.aprobada, true);
+  estructura(await api('GET', `/api/curiosidades/${c.json.data.id}`), 200);
+  estructura(await api('DELETE', `/api/curiosidades/${c.json.data.id}`, { token: t.admin }), 200);
 });
 
 test('Categorías: no se puede borrar una categoría en uso (409)', async () => {
@@ -352,6 +385,45 @@ test('Contacto: bandeja de admin, marcar leído y eliminar; usuario normal 403',
   estructura(await api('GET', `/api/contacto/${id}`, { token: t.admin }), 200);
   estructura(await api('DELETE', `/api/contacto/${id}`, { token: t.admin }), 200);
   estructura(await api('GET', `/api/contacto/${id}`, { token: t.admin }), 404);
+});
+
+test('Recuperar contraseña: respuesta igual exista o no la cuenta; el enlace funciona una sola vez', async () => {
+  const { _enviados } = require('../services/correo.service');
+  _enviados.length = 0;
+  const reg = await api('POST', '/api/auth/registro', { body: { nombre: 'Elena Cruz', correo: 'elena@correo.com', password: 'Grano#Rojo2026' } });
+  estructura(reg, 201);
+
+  const a = await api('POST', '/api/auth/recuperar', { body: { correo: 'elena@correo.com' } });
+  const b = await api('POST', '/api/auth/recuperar', { body: { correo: 'nadie@correo.com' } });
+  estructura(a, 200);
+  estructura(b, 200);
+  assert.equal(a.json.message, b.json.message);
+  assert.equal(_enviados.length, 1, 'solo se envía correo a cuentas que existen');
+  assert.equal(_enviados[0].para, 'elena@correo.com');
+  const enlace = _enviados[0].texto.match(/https:\/\/cafe\.ejemplo\.hn\/restablecer#token=(\S+)/);
+  assert.ok(enlace, 'el correo debe traer el enlace con el dominio configurado');
+  const token = enlace[1];
+
+  estructura(await api('POST', '/api/auth/restablecer', { body: { token: 'basura', password_nueva: 'Molino&Grano72' } }), 400);
+  const debil = await api('POST', '/api/auth/restablecer', { body: { token, password_nueva: 'Elena#2026xy' } });
+  estructura(debil, 400);
+  assert.equal(debil.json.errors[0].campo, 'password_nueva');
+  estructura(await api('POST', '/api/auth/restablecer', { body: { token, password_nueva: 'Molino&Grano72' } }), 200);
+  estructura(await api('POST', '/api/auth/restablecer', { body: { token, password_nueva: 'Otra!Clave9921' } }), 400);
+  estructura(await api('POST', '/api/auth/login', { body: { correo: 'elena@correo.com', password: 'Molino&Grano72' } }), 200);
+  // La sesión que tenía antes deja de valer.
+  estructura(await api('GET', '/api/auth/perfil', { token: reg.json.data.token }), 401);
+});
+
+test('Contacto: cada mensaje nuevo envía un aviso por correo al equipo', async () => {
+  const { _enviados } = require('../services/correo.service');
+  _enviados.length = 0;
+  const r = await api('POST', '/api/contacto', { body: { nombre: 'Luis Paz', correo: 'luis@correo.com', asunto: 'productos', mensaje: '¿Venden café de Copán en grano?' } });
+  estructura(r, 201);
+  assert.equal(_enviados.length, 1);
+  assert.equal(_enviados[0].para, 'equipo@cafehondureno.hn');
+  assert.equal(_enviados[0].responderA, 'luis@correo.com');
+  assert.match(_enviados[0].texto, /Copán en grano/);
 });
 
 test('Al menos el 50 % de las rutas de la API requieren token', () => {

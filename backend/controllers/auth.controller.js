@@ -34,4 +34,14 @@ class AuthController {
   }
 }
 
+AuthController.recuperar = async function (req, res) {
+  const data = await AuthService.solicitarRestablecimiento(req.body);
+  return enviarExito(res, { statusCode: 200, message: data.mensaje, data: null });
+};
+
+AuthController.restablecer = async function (req, res) {
+  const data = await AuthService.restablecerPassword(req.body);
+  return enviarExito(res, { statusCode: 200, message: data.mensaje, data: null });
+};
+
 module.exports = AuthController;

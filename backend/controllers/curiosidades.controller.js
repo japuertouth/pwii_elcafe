@@ -22,7 +22,7 @@ class CuriosidadesController {
 
   static async obtenerPorId(req, res, next) {
     try {
-      const curiosidad = await CuriosidadesService.obtenerPorId(req.params.id);
+      const curiosidad = await CuriosidadesService.obtenerPorId(req.params.id, req.usuario);
       return enviarExito(res, { statusCode: 200, data: curiosidad });
     } catch (error) {
       return next(error);
@@ -33,7 +33,10 @@ class CuriosidadesController {
     try {
       const nueva = await CuriosidadesService.crear(req.body, req.usuario);
       res.location(`${req.baseUrl}/${nueva.id}`);
-      return enviarExito(res, { statusCode: 201, message: 'Curiosidad creada correctamente', data: nueva });
+      const message = nueva.aprobada
+        ? 'Curiosidad creada correctamente'
+        : 'Curiosidad recibida: un administrador la revisará antes de publicarla';
+      return enviarExito(res, { statusCode: 201, message, data: nueva });
     } catch (error) {
       return next(error);
     }
@@ -52,6 +55,25 @@ class CuriosidadesController {
     try {
       const actualizada = await CuriosidadesService.actualizarParcial(req.params.id, req.body, req.usuario);
       return enviarExito(res, { statusCode: 200, message: 'Curiosidad actualizada correctamente', data: actualizada });
+    } catch (error) {
+      return next(error);
+    }
+  }
+
+  static async pendientes(req, res, next) {
+    try {
+      const { items, meta } = await CuriosidadesService.pendientes(req.query);
+      return enviarExito(res, { statusCode: 200, data: items, meta });
+    } catch (error) {
+      return next(error);
+    }
+  }
+
+  static async moderar(req, res, next) {
+    try {
+      const data = await CuriosidadesService.moderar(req.params.id, req.body);
+      const message = data.aprobada ? 'Curiosidad aprobada y publicada' : 'Curiosidad devuelta a revisión';
+      return enviarExito(res, { statusCode: 200, message, data });
     } catch (error) {
       return next(error);
     }

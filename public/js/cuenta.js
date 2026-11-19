@@ -39,6 +39,39 @@
   });
   if (location.hash === '#registro') activar($('tab-registro'));
 
+  /* ---------- ¿Olvidaste tu contraseña? ---------- */
+  function mostrarRecuperar(mostrar) {
+    $('formRecuperar').hidden = !mostrar;
+    $('formLogin').hidden = mostrar;
+    document.querySelector('#panelAcceso .pestanas').hidden = mostrar;
+    if (mostrar) {
+      $('rec-correo').value = $('login-correo').value;
+      $('rec-correo').focus();
+    } else {
+      $('login-correo').focus();
+    }
+  }
+  $('botonOlvide').addEventListener('click', function () { mostrarRecuperar(true); });
+  $('botonVolverLogin').addEventListener('click', function () { mostrarRecuperar(false); });
+
+  $('formRecuperar').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    var aviso = $('avisoRecuperar');
+    var correo = R.validarCorreo($('rec-correo').value, { bloquearTemporales: false });
+    C.marcarError('rec-correo', correo.ok ? '' : correo.mensaje);
+    if (!correo.ok) { $('rec-correo').focus(); return; }
+    var boton = e.target.querySelector('button[type="submit"]');
+    C.ocupado(boton, true, 'Enviando…');
+    try {
+      var r = await C.api('/auth/recuperar', { metodo: 'POST', autenticar: false, cuerpo: { correo: correo.valor } });
+      C.aviso(aviso, r.message, 'exito');
+    } catch (error) {
+      C.aviso(aviso, error.message, 'error');
+    } finally {
+      C.ocupado(boton, false);
+    }
+  });
+
   /* ---------- Lista de requisitos de la contraseña en vivo ---------- */
   function vigilarPassword(idCampo, idLista, datosPersonales) {
     var lista = $(idLista);
@@ -156,6 +189,7 @@
     $('perfilNombre').textContent = u.nombre || '';
     $('perfilCorreo').textContent = u.correo || '';
     $('perfilRol').textContent = u.rol === 'admin' || u.rol === 'administrador' ? 'Administrador' : 'Usuario';
+    $('enlaceAdmin').hidden = !(u.rol === 'admin' || u.rol === 'administrador');
     $('perfilFecha').textContent = u.creado_en ? new Date(u.creado_en).toLocaleDateString('es-HN', { year: 'numeric', month: 'long', day: 'numeric' }) : '—';
   }
 
@@ -251,9 +285,11 @@
     var boton = e.target.querySelector('button[type="submit"]');
     C.ocupado(boton, true, 'Publicando…');
     try {
-      await C.api('/curiosidades', { metodo: 'POST', cuerpo: { titulo: titulo, descripcion: descripcion, categoria_id: Number($('cur-categoria').value) } });
+      var r = await C.api('/curiosidades', { metodo: 'POST', cuerpo: { titulo: titulo, descripcion: descripcion, categoria_id: Number($('cur-categoria').value) } });
       e.target.reset();
-      C.aviso(aviso, 'Curiosidad publicada. Ya aparece en la página de curiosidades.', 'exito');
+      C.aviso(aviso, r.data && r.data.aprobada === false
+        ? '¡Gracias! Tu curiosidad quedó en revisión: aparecerá en la página cuando un administrador la apruebe.'
+        : 'Curiosidad publicada. Ya aparece en la página de curiosidades.', 'exito');
     } catch (error) {
       mostrarErroresApi(error, { titulo: 'cur-titulo', descripcion: 'cur-descripcion', categoria_id: 'cur-categoria' }, aviso);
     } finally {

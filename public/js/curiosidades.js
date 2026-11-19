@@ -4,11 +4,11 @@
 
   var TEMAS = { economia: 'Economía', historia: 'Historia', cultivo: 'Cultivo', cultura: 'Cultura' };
   var LOCALES = [
-    { tema: 'economia', titulo: 'Gigante de Centroamérica', texto: 'Honduras es el mayor productor de café de Centroamérica y uno de los cinco más grandes del mundo.' },
-    { tema: 'economia', titulo: 'Un café de pequeños productores', texto: 'Unas 120,000 familias cultivan café en el país, y el 90 % de ellas son pequeños caficultores.' },
+    { tema: 'economia', titulo: 'Gigante de Centroamérica', texto: 'Honduras es el mayor productor de café de Centroamérica y el quinto productor del mundo.' },
+    { tema: 'economia', titulo: 'Casi 97,000 productores', texto: 'En la cosecha 2025-2026 había 96,903 productores de café registrados en el Ihcafé, la mayoría con fincas pequeñas.' },
     { tema: 'economia', titulo: 'Un millón de empleos', texto: 'Durante la cosecha, el café genera cerca de un millón de empleos entre el corte, el beneficiado y el transporte.' },
-    { tema: 'economia', titulo: 'La principal fuente de divisas', texto: 'El café es lo que más dólares aporta a Honduras por exportación. En la cosecha 2024-2025 se superaron los US$2,100 millones.' },
-    { tema: 'economia', titulo: 'El quintal pesa 46 kilos', texto: 'El café se vende por quintales de 46 kg. En 2024-2025 se exportaron 6.1 millones de quintales, a un precio promedio cercano a US$360 cada uno.' },
+    { tema: 'economia', titulo: 'La principal fuente de divisas', texto: 'El café es lo que más dólares aporta a Honduras por exportación. La cosecha 2025-2026 dejó US$2,285 millones, la cifra más alta de su historia.' },
+    { tema: 'economia', titulo: 'Un récord de 7.3 millones de quintales', texto: 'El café se vende por quintales de 46 kg. En la cosecha 2025-2026 Honduras produjo 7.5 millones y exportó 7.3 millones a 53 países.' },
     { tema: 'historia', titulo: 'Llegó hace más de dos siglos', texto: 'Las primeras plantas de café llegaron a Honduras a finales del siglo XVIII, traídas desde otras colonias de la región.' },
     { tema: 'historia', titulo: 'Nace el IHCAFE', texto: 'En 1970 se creó el Instituto Hondureño del Café para organizar la caficultura y apoyar a los productores.' },
     { tema: 'historia', titulo: 'Marcala hizo historia', texto: 'En 2005 el café de Marcala recibió la primera Denominación de Origen para café de Centroamérica.' },
@@ -22,7 +22,7 @@
     { tema: 'cultura', titulo: 'Tamal con cafecito', texto: 'El tamal acompañado de una taza de café caliente es una combinación clásica en las mesas hondureñas, sobre todo en días de fiesta.' },
   ];
   var MITOS = [
-    { frase: 'Honduras es el mayor productor de café de Centroamérica.', real: true, resp: 'Lo es desde 2011, cuando superó a Guatemala, y está entre los cinco mayores productores del mundo.' },
+    { frase: 'Honduras es el mayor productor de café de Centroamérica.', real: true, resp: 'Lo es desde 2011, cuando superó a Guatemala, y hoy es el quinto productor del mundo.' },
     { frase: 'El café hondureño crece a nivel del mar.', real: false, resp: 'Se cultiva en zonas de montaña, aproximadamente entre los 1,000 y los 1,700 metros sobre el nivel del mar.' },
     { frase: 'El grano de café es en realidad la semilla de una fruta.', real: true, resp: 'Cada cereza de café contiene normalmente dos semillas, que son los granos que conocemos.' },
     { frase: 'La cosecha de café empieza el 1 de enero.', real: false, resp: 'Empieza el 1 de octubre, fecha en que se celebra el Día Nacional de la Caficultura.' },
