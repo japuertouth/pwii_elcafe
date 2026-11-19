@@ -1,13 +1,13 @@
 /* =========================================================
    Café Hondureño · hoja de estilos única para todo el sitio
-   Inspiración: los sellos estampados en los sacos de yute
-   con los que el café de Honduras sale hacia el mundo.
+   Títulos en Bricolage Grotesque; texto en Atkinson Hyperlegible.
+   Los recuadros "sello" recuerdan los sacos de yute de exportación.
    ========================================================= */
 
 /* ---------- 0. Tipografías (alojadas en el propio sitio, licencia SIL OFL) ---------- */
-@font-face { font-family: "Big Shoulders Stencil Display"; src: url("../fuentes/big-shoulders-stencil-display-latin-600-normal.woff2") format("woff2"); font-weight: 600; font-display: swap; }
-@font-face { font-family: "Big Shoulders Stencil Display"; src: url("../fuentes/big-shoulders-stencil-display-latin-700-normal.woff2") format("woff2"); font-weight: 700; font-display: swap; }
-@font-face { font-family: "Big Shoulders Stencil Display"; src: url("../fuentes/big-shoulders-stencil-display-latin-800-normal.woff2") format("woff2"); font-weight: 800; font-display: swap; }
+@font-face { font-family: "Bricolage Grotesque"; src: url("../fuentes/bricolage-grotesque-latin-600-normal.woff2") format("woff2"); font-weight: 600; font-display: swap; }
+@font-face { font-family: "Bricolage Grotesque"; src: url("../fuentes/bricolage-grotesque-latin-700-normal.woff2") format("woff2"); font-weight: 700; font-display: swap; }
+@font-face { font-family: "Bricolage Grotesque"; src: url("../fuentes/bricolage-grotesque-latin-800-normal.woff2") format("woff2"); font-weight: 800; font-display: swap; }
 @font-face { font-family: "Atkinson Hyperlegible"; src: url("../fuentes/atkinson-hyperlegible-latin-400-normal.woff2") format("woff2"); font-weight: 400; font-display: swap; }
 @font-face { font-family: "Atkinson Hyperlegible"; src: url("../fuentes/atkinson-hyperlegible-latin-400-italic.woff2") format("woff2"); font-weight: 400; font-style: italic; font-display: swap; }
 @font-face { font-family: "Atkinson Hyperlegible"; src: url("../fuentes/atkinson-hyperlegible-latin-700-normal.woff2") format("woff2"); font-weight: 700; font-display: swap; }
@@ -30,12 +30,12 @@
   --peligro: #a3242b;
   --sombra: 0 1px 2px rgb(28 36 32 / 0.08), 0 8px 24px -12px rgb(28 36 32 / 0.25);
 
-  --f-titulo: "Big Shoulders Stencil Display", "Arial Narrow", Impact, sans-serif;
+  --f-titulo: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
   --f-texto: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
 
-  --t-1: clamp(2.6rem, 6vw + 1rem, 5rem);
-  --t-2: clamp(1.9rem, 2.5vw + 1rem, 2.75rem);
-  --t-3: 1.375rem;
+  --t-1: clamp(2.4rem, 5vw + 1rem, 4.5rem);
+  --t-2: clamp(1.75rem, 2vw + 1rem, 2.5rem);
+  --t-3: 1.25rem;
   --t-texto: 1.0625rem;
   --t-pequeno: 0.9rem;
 
@@ -98,13 +98,13 @@ button { cursor: pointer; }
 h1, h2, h3 {
   font-family: var(--f-titulo);
   font-weight: 800;
-  line-height: 1.02;
-  letter-spacing: 0.01em;
+  line-height: 1.05;
+  letter-spacing: -0.025em;
   text-wrap: balance;
 }
 h1 { font-size: var(--t-1); }
 h2 { font-size: var(--t-2); margin-bottom: 0.75rem; }
-h3 { font-size: var(--t-3); font-weight: 700; letter-spacing: 0.02em; }
+h3 { font-size: var(--t-3); font-weight: 700; letter-spacing: -0.01em; }
 p { max-width: 68ch; text-wrap: pretty; }
 p + p { margin-top: 0.9rem; }
 strong { font-weight: 700; }
@@ -165,9 +165,9 @@ a:hover { text-decoration-thickness: 2px; }
   text-decoration: none;
   font-family: var(--f-titulo);
   font-weight: 800;
-  font-size: 1.6rem;
+  font-size: 1.35rem;
   line-height: 1;
-  letter-spacing: 0.02em;
+  letter-spacing: -0.02em;
   margin-right: auto;
 }
 .marca img { width: 2.1rem; height: 2.1rem; }
@@ -259,11 +259,11 @@ a:hover { text-decoration-thickness: 2px; }
   color: var(--yute-claro);
   transform: rotate(-2.5deg);
   font-family: var(--f-titulo);
-  letter-spacing: 0.04em;
+  letter-spacing: -0.01em;
 }
 :root[data-tema="oscuro"] .sello { color: var(--yute); }
-.sello__titulo { font-size: 2rem; font-weight: 800; line-height: 1; color: var(--yute); }
-.sello dl { display: grid; grid-template-columns: auto 1fr; gap: 0.35rem 1rem; margin-top: 1rem; font-size: 1.15rem; }
+.sello__titulo { font-size: 1.7rem; font-weight: 800; line-height: 1; color: var(--yute); }
+.sello dl { display: grid; grid-template-columns: auto 1fr; gap: 0.35rem 1rem; margin-top: 1rem; font-size: 1rem; }
 .sello dt { opacity: 0.75; font-weight: 600; }
 .sello dd { margin: 0; font-weight: 800; text-align: right; }
 
@@ -414,7 +414,7 @@ a:hover { text-decoration-thickness: 2px; }
 }
 .cifra { padding: 1.75rem 1.25rem; border-right: 1px solid var(--linea); }
 .cifra:last-child { border-right: 0; }
-.cifra .cifra__valor { font-family: var(--f-titulo); font-weight: 800; font-size: clamp(2rem, 3vw + 1rem, 3rem); line-height: 1; color: var(--cereza); }
+.cifra .cifra__valor { font-family: var(--f-titulo); font-weight: 800; font-size: clamp(1.8rem, 2.4vw + 1rem, 2.6rem); line-height: 1; letter-spacing: -0.03em; color: var(--cereza); }
 .cifra p + p { color: var(--tinta-suave); margin-top: 0.4rem; font-size: 0.98rem; }
 @media (max-width: 760px) {
   .cifras { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -444,8 +444,8 @@ a:hover { text-decoration-thickness: 2px; }
   background: var(--superficie);
   font-family: var(--f-titulo);
   font-weight: 700;
-  font-size: 1.3rem;
-  letter-spacing: 0.03em;
+  font-size: 1.1rem;
+  letter-spacing: -0.01em;
 }
 .regiones__lista button[aria-pressed="true"] { border-color: var(--cereza); box-shadow: inset 4px 0 0 var(--cereza); }
 .region {
@@ -455,7 +455,7 @@ a:hover { text-decoration-thickness: 2px; }
   padding: clamp(1.25rem, 3vw, 2rem);
   min-height: 16rem;
 }
-.region h3 { font-size: 2.2rem; margin-bottom: 0.5rem; }
+.region h3 { font-size: 2rem; margin-bottom: 0.5rem; }
 .region__datos { display: grid; grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr)); gap: 1rem; margin-top: 1.5rem; }
 .region__datos div { border-top: 2px solid var(--yute); padding-top: 0.5rem; }
 .region__datos dt { font-size: 0.85rem; color: var(--tinta-suave); }
@@ -470,7 +470,7 @@ a:hover { text-decoration-thickness: 2px; }
 .linea-tiempo { list-style: none; padding: 0; display: grid; gap: 0; counter-reset: hito; max-width: var(--lectura); }
 .hito { display: grid; grid-template-columns: 8.5rem 1fr; gap: 1.25rem; padding-block: 1.1rem; border-top: 1px solid var(--linea); }
 .hito:last-child { border-bottom: 1px solid var(--linea); }
-.hito__fecha { font-family: var(--f-titulo); font-weight: 800; font-size: 1.35rem; color: var(--cereza); line-height: 1.2; }
+.hito__fecha { font-family: var(--f-titulo); font-weight: 800; font-size: 1.15rem; letter-spacing: -0.01em; color: var(--cereza); line-height: 1.2; }
 @media (max-width: 520px) { .hito { grid-template-columns: 1fr; gap: 0.25rem; } }
 
 .calculadora {
@@ -491,14 +491,15 @@ a:hover { text-decoration-thickness: 2px; }
 .opcion input:focus-visible + span { outline: 3px solid var(--azul); outline-offset: 2px; }
 .resultado { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
 .resultado div { border-top: 2px solid var(--yute); padding-top: 0.5rem; }
-.resultado output { display: block; font-family: var(--f-titulo); font-weight: 800; font-size: 2.6rem; line-height: 1; color: var(--cereza); }
+.resultado output { display: block; font-family: var(--f-titulo); font-weight: 800; font-size: 2.3rem; letter-spacing: -0.03em; line-height: 1; color: var(--cereza); }
 
 .dato-curioso { max-width: var(--lectura); }
 .dato-curioso blockquote {
   font-family: var(--f-titulo);
-  font-size: clamp(1.6rem, 2vw + 1rem, 2.2rem);
+  font-size: clamp(1.4rem, 1.5vw + 1rem, 1.9rem);
   font-weight: 700;
-  line-height: 1.15;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
   min-height: 3.5em;
   transition: opacity 0.2s;
 }
@@ -516,14 +517,14 @@ a:hover { text-decoration-thickness: 2px; }
 }
 .explora img { aspect-ratio: 16 / 10; object-fit: cover; width: 100%; }
 .explora div { padding: 1rem 1.1rem 1.25rem; }
-.explora h3 { font-size: 1.6rem; }
+.explora h3 { font-size: 1.4rem; }
 .explora p { color: var(--tinta-suave); font-size: 0.98rem; margin-top: 0.25rem; }
 .explora a:hover h3 { color: var(--cereza); }
 
 /* ---------- 7. El café (guía) ---------- */
 .guia { display: grid; grid-template-columns: 14rem minmax(0, 1fr); gap: clamp(2rem, 5vw, 4rem); align-items: start; }
 .indice { position: sticky; top: 6rem; }
-.indice h2 { font-size: 1.4rem; }
+.indice h2 { font-size: 1.2rem; }
 .indice ol { list-style: none; padding: 0; display: grid; gap: 0.15rem; border-left: 2px solid var(--linea); }
 .indice a { display: block; padding: 0.35rem 0 0.35rem 1rem; margin-left: -2px; border-left: 2px solid transparent; color: var(--tinta-suave); text-decoration: none; }
 .indice a:hover { color: var(--tinta); }
@@ -564,7 +565,7 @@ a:hover { text-decoration-thickness: 2px; }
 .galeria__boton img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; transition: transform 0.3s ease; }
 .galeria__boton:hover img { transform: scale(1.03); }
 .galeria__item figcaption { padding: 0.6rem 0.1rem 0; }
-.galeria__item h3 { font-size: 1.35rem; }
+.galeria__item h3 { font-size: 1.15rem; }
 .galeria__item p { color: var(--tinta-suave); font-size: 0.95rem; }
 .vacio { padding: 2rem; border: 1.5px dashed var(--linea); border-radius: var(--radio-grande); color: var(--tinta-suave); }
 
@@ -596,7 +597,7 @@ a:hover { text-decoration-thickness: 2px; }
   background: rgb(0 0 0 / 0.12);
   border-radius: var(--radio);
 }
-.destacado h2 { color: #fff; font-size: 1.9rem; margin: 0; }
+.destacado h2 { color: #fff; font-size: 1.6rem; margin: 0; }
 :root[data-tema="oscuro"] .destacado h2 { color: var(--bosque-texto); }
 .destacado p { color: rgb(238 242 234 / 0.88); }
 .destacado .cambiando { opacity: 0; }
@@ -613,7 +614,7 @@ a:hover { text-decoration-thickness: 2px; }
   gap: 0.4rem;
   align-content: start;
 }
-.ficha h3 { font-size: 1.45rem; }
+.ficha h3 { font-size: 1.2rem; }
 .ficha p { color: var(--tinta-suave); font-size: 0.98rem; }
 .ficha[data-tema="economia"] { --color-tema: #b5232b; }
 .ficha[data-tema="historia"] { --color-tema: #1d5fa8; }
@@ -688,7 +689,7 @@ a:hover { text-decoration-thickness: 2px; }
 
 .contacto { display: grid; grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr); gap: clamp(2rem, 5vw, 4rem); align-items: start; }
 .contacto__datos dl { display: grid; gap: 1.25rem; margin-top: 1.5rem; }
-.contacto__datos dt { font-family: var(--f-titulo); font-weight: 700; font-size: 1.3rem; }
+.contacto__datos dt { font-family: var(--f-titulo); font-weight: 700; font-size: 1.15rem; }
 .contacto__datos dd { margin: 0.15rem 0 0; color: var(--tinta-suave); }
 .panel {
   background: var(--superficie);
@@ -707,7 +708,7 @@ a:hover { text-decoration-thickness: 2px; }
   padding: 0.8rem;
   font-family: var(--f-titulo);
   font-weight: 700;
-  font-size: 1.4rem;
+  font-size: 1.2rem;
   color: var(--tinta-suave);
   border-bottom: 3px solid transparent;
   margin-bottom: -1.5px;
@@ -730,11 +731,11 @@ a:hover { text-decoration-thickness: 2px; }
   font-size: 0.97rem;
 }
 .pie__columnas { display: grid; grid-template-columns: 1.3fr 1fr 1.2fr; gap: 2rem; }
-.pie h2 { font-size: 1.35rem; color: var(--bosque-texto); margin-bottom: 0.6rem; }
+.pie h2 { font-size: 1.15rem; color: var(--bosque-texto); margin-bottom: 0.6rem; }
 .pie ul { list-style: none; padding: 0; display: grid; gap: 0.3rem; }
 .pie a { color: var(--yute-claro); }
 :root[data-tema="oscuro"] .pie a { color: var(--yute); }
-.pie .marca { font-size: 1.8rem; color: var(--bosque-texto); margin-bottom: 0.6rem; }
+.pie .marca { font-size: 1.5rem; color: var(--bosque-texto); margin-bottom: 0.6rem; }
 .pie__legal { margin-top: 2.5rem; padding-top: 1.25rem; border-top: 1px solid rgb(255 255 255 / 0.12); display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.75rem; font-size: 0.88rem; }
 @media (max-width: 760px) { .pie__columnas { grid-template-columns: 1fr; } }
 

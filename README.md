@@ -115,4 +115,4 @@ La documentación de cada endpoint está en `docs/API.md` y la colección de Pos
 
 Josue Alejandro Puerto Ulloa · Eduardo Alberto Meza · Nathaly Melissa Aguilar Gómez · Josse Armando Galeano · José Daniel Muñoz Cruz
 
-Fotografías: Wikimedia Commons (ver `public/imagenes/CREDITOS.txt`). Tipografías: Big Shoulders Stencil Display y Atkinson Hyperlegible (SIL Open Font License).
+Fotografías: Wikimedia Commons (ver `public/imagenes/CREDITOS.txt`). Tipografías: Bricolage Grotesque (títulos) y Atkinson Hyperlegible (texto) (SIL Open Font License).
