@@ -1,0 +1,67 @@
+EVIDENCIA DE USO DE IA — BASE DE DATOS
+Proyecto: Café Hondureño — API REST (Programación Web II, II Parcial, Grupo 2)
+Herramienta utilizada: Claude (Anthropic)
+
+
+   Necesito diseñar la base de datos para el backend de nuestra fan page Café
+   Hondureño. El proyecto pide una tabla de usuarios y al menos dos tablas
+   relacionadas con la temática. La página tiene inicio con las regiones del café,
+   curiosidades, galería y contacto.
+
+
+   La base va a estar en Azure SQL (SQL Server). Ayúdame a definir los tipos de
+   datos adecuados y cómo crearla en Azure.
+
+   Necesito manejar usuarios normales y administradores. haz la tabla de
+   usuarios y la de roles para que el rol por defecto sea usuario
+
+   El login va a usar JWT y las contraseñas se guardan con bcrypt. ¿Qué campos
+   necesita la tabla de usuarios? El correo debe ser único y con formato válido.
+
+   En la página de inicio mostramos las 6 regiones cafetaleras con sus
+   departamentos, la altura y el perfil de taza. Quiero guardarlas en una tabla.
+
+   Las curiosidades y la galería tienen categorías. usa una sola tabla de
+   categorías para las dos. Que no se repita el mismo nombre dentro del mismo tipo.
+
+   Necesito una tabla para las fotos de la galería con título, descripción, URL de
+   la imagen, categoría, región y quién la subió.
+
+   El formulario de contacto tiene nombre, correo, asunto (información, productos,
+   sugerencia u otro) y mensaje. Quiero guardar los mensajes, saber si ya se leyeron
+   y relacionarlos con el usuario si inició sesión.
+
+
+    Ayúdame a insertar los datos que ya tiene la fan page: los roles, las regiones,
+    las categorías, algunas fotos de la galería y algunas curiosidades.
+
+    Hazme un resumen en texto de todas las tablas con sus campos, tipos y notas para
+    pasárselo a mis compañeros.
+
+
+RESULTADO OBTENIDO
+------------------
+Base de datos "cafehondureno" en Azure SQL (servidor progav2.database.windows.net)
+con 7 tablas:
+
+- roles: id, nombre (único). 1 = admin, 2 = usuario.
+- usuarios: id, nombre, correo (único, con validación de formato), password_hash
+  (bcrypt), rol_id (FK a roles, por defecto 2), activo, creado_en, actualizado_en.
+- regiones: id, nombre (único), departamentos, altitud, perfil_taza, descripcion,
+  imagen_url.
+- categorias: id, nombre, tipo (solo "curiosidad" o "galeria"); nombre + tipo único.
+- curiosidades: id, titulo, descripcion, categoria_id (FK), region_id (FK opcional,
+  queda en NULL si se borra la región), creado_por (FK opcional, queda en NULL si se
+  borra el usuario), creado_en, actualizado_en.
+- galeria: id, titulo, descripcion, imagen_url, categoria_id (FK), region_id (FK
+  opcional), subido_por (FK opcional), creado_en.
+- mensajes_contacto: id, nombre, correo, asunto (informacion, productos, sugerencia u
+  otro), mensaje, usuario_id (FK opcional), leido (por defecto 0), creado_en.
+
+Relaciones: usuarios → roles; curiosidades → categorias, regiones y usuarios;
+galeria → categorias, regiones y usuarios; mensajes_contacto → usuarios.
+
+Datos iniciales cargados: 2 roles, 1 administrador, 6 regiones, 4 categorías de
+curiosidades, 6 categorías de galería, 6 fotos y 7 curiosidades.
+
+El detalle completo de la estructura está en el archivo "base de datos.txt".

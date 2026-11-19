@@ -1,0 +1,5034 @@
+{
+  "info": {
+    "name": "Café Hondureño API — Grupo 2",
+    "description": "Colección completa de la API (Programación Web II, Grupo 2).\n\nCÓMO USARLA\n1. Levanta el backend (cd backend && npm start).\n2. En las variables de la colección completa correoAdmin y passwordAdmin con un usuario administrador (ver README, \"Primer administrador\").\n3. Ejecuta la colección completa con el Runner, EN ORDEN: cada petición guarda en variables los tokens e ids que usan las siguientes.\n\nCada petición tiene pruebas automáticas (código de estado y estructura JSON) y una respuesta de EJEMPLO guardada, obtenida al ejecutar este mismo recorrido contra la base de pruebas local (SQLite con las mismas tablas de Azure).\n\nDatos que deja en la base: el usuario de prueba registrado (no hay endpoint para borrar usuarios). Todo lo demás que crea (curiosidad, foto, región, categoría y mensaje) lo elimina al final.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "0. General",
+      "item": [
+        {
+          "name": "Estado de la API y de la base  →  200",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 200 OK', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Estructura JSON uniforme (status = \"success\")', () => pm.expect(j.status).to.eql('success'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "noauth"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/salud",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "salud"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 200 OK (base de pruebas local)",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:4000/api/salud",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "4000",
+                  "path": [
+                    "api",
+                    "salud"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "body": "{\n  \"status\": \"success\",\n  \"message\": \"API funcionando\",\n  \"data\": {\n    \"api\": \"ok\",\n    \"baseDeDatos\": \"ok\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Ruta inexistente  →  404",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 404 Not Found', () => pm.response.to.have.status(404));",
+                  "const j = pm.response.json();",
+                  "pm.test('Estructura JSON uniforme (status = \"error\")', () => pm.expect(j.status).to.eql('error'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "noauth"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/ruta-que-no-existe",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "ruta-que-no-existe"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 404 Not Found (base de pruebas local)",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:4000/api/ruta-que-no-existe",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "4000",
+                  "path": [
+                    "api",
+                    "ruta-que-no-existe"
+                  ]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "body": "{\n  \"status\": \"error\",\n  \"message\": \"Ruta no encontrada: GET /api/ruta-que-no-existe\"\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "1. Autenticación",
+      "item": [
+        {
+          "name": "Registro de usuario  →  201",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('correoPrueba', 'prueba' + Date.now() + '@correo.com');",
+                  "pm.collectionVariables.set('passwordPrueba', 'Grano#Rojo2026');"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 201 Created', () => pm.response.to.have.status(201));",
+                  "const j = pm.response.json();",
+                  "pm.test('Estructura JSON uniforme (status = \"success\")', () => pm.expect(j.status).to.eql('success'));",
+                  "if (j?.data?.token !== undefined) pm.collectionVariables.set('token', j.data.token);",
+                  "if (j?.data?.usuario?.id !== undefined) pm.collectionVariables.set('usuarioPruebaId', j.data.usuario.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "auth": {
+              "type": "noauth"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/registro",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "registro"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Usuario de Prueba\",\n  \"correo\": \"{{correoPrueba}}\",\n  \"password\": \"{{passwordPrueba}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 201 Created (base de pruebas local)",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:4000/api/auth/registro",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "4000",
+                  "path": [
+                    "api",
+                    "auth",
+                    "registro"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"nombre\": \"Usuario de Prueba\",\n  \"correo\": \"prueba1794533209069@correo.com\",\n  \"password\": \"Grano#Rojo2026\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "body": "{\n  \"status\": \"success\",\n  \"message\": \"Usuario registrado correctamente\",\n  \"data\": {\n    \"token\": \"eyJhbGciOiJIUzI1NiIs...(token oculto)\",\n    \"tipo\": \"Bearer\",\n    \"expira_en\": \"1h\",\n    \"usuario\": {\n      \"id\": 3,\n      \"nombre\": \"Usuario de Prueba\",\n      \"correo\": \"prueba1794533209069@correo.com\",\n      \"rol_id\": 2,\n      \"rol\": \"usuario\",\n      \"activo\": true,\n      \"creado_en\": \"2026-11-13T01:26:49.092Z\",\n      \"actualizado_en\": \"2026-11-13T01:26:49.092Z\"\n    }\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Registro con datos inválidos  →  400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 400 Bad Request', () => pm.response.to.have.status(400));",
+                  "const j = pm.response.json();",
+                  "pm.test('Estructura JSON uniforme (status = \"error\")', () => pm.expect(j.status).to.eql('error'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "auth": {
+              "type": "noauth"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/registro",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "registro"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"\",\n  \"correo\": \"no-es-un-correo\",\n  \"password\": \"123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 400 Bad Request (base de pruebas local)",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:4000/api/auth/registro",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "4000",
+                  "path": [
+                    "api",
+                    "auth",
+                    "registro"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"nombre\": \"\",\n  \"correo\": \"no-es-un-correo\",\n  \"password\": \"123\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "body": "{\n  \"status\": \"error\",\n  \"message\": \"Datos inválidos\",\n  \"errors\": [\n    {\n      \"campo\": \"nombre\",\n      \"mensaje\": \"El nombre es obligatorio y debe ser texto\"\n    },\n    {\n      \"campo\": \"correo\",\n      \"mensaje\": \"El correo no tiene un formato válido\"\n    },\n    {\n      \"campo\": \"password\",\n      \"mensaje\": \"La contraseña debe tener entre 8 y 72 caracteres\"\n    }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "Registro con correo repetido  →  409",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 409 Conflict', () => pm.response.to.have.status(409));",
+                  "const j = pm.response.json();",
+                  "pm.test('Estructura JSON uniforme (status = \"error\")', () => pm.expect(j.status).to.eql('error'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "auth": {
+              "type": "noauth"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/registro",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "registro"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Otra Persona\",\n  \"correo\": \"{{correoPrueba}}\",\n  \"password\": \"Molienda#2026x\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 409 Conflict (base de pruebas local)",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:4000/api/auth/registro",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "4000",
+                  "path": [
+                    "api",
+                    "auth",
+                    "registro"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"nombre\": \"Otra Persona\",\n  \"correo\": \"prueba1794533209069@correo.com\",\n  \"password\": \"Molienda#2026x\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Conflict",
+              "code": 409,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "body": "{\n  \"status\": \"error\",\n  \"message\": \"Ya existe una cuenta registrada con ese correo\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Login (usuario)  →  200",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 200 OK', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Estructura JSON uniforme (status = \"success\")', () => pm.expect(j.status).to.eql('success'));",
+                  "if (j?.data?.token !== undefined) pm.collectionVariables.set('token', j.data.token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "auth": {
+              "type": "noauth"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"correo\": \"{{correoPrueba}}\",\n  \"password\": \"{{passwordPrueba}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 200 OK (base de pruebas local)",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:4000/api/auth/login",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "4000",
+                  "path": [
+                    "api",
+                    "auth",
+                    "login"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"correo\": \"prueba1794533209069@correo.com\",\n  \"password\": \"Grano#Rojo2026\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "body": "{\n  \"status\": \"success\",\n  \"message\": \"Inicio de sesión exitoso\",\n  \"data\": {\n    \"token\": \"eyJhbGciOiJIUzI1NiIs...(token oculto)\",\n    \"tipo\": \"Bearer\",\n    \"expira_en\": \"1h\",\n    \"usuario\": {\n      \"id\": 3,\n      \"nombre\": \"Usuario de Prueba\",\n      \"correo\": \"prueba1794533209069@correo.com\",\n      \"rol_id\": 2,\n      \"rol\": \"usuario\",\n      \"activo\": true,\n      \"creado_en\": \"2026-11-13T01:26:49.092Z\",\n      \"actualizado_en\": \"2026-11-13T01:26:49.092Z\"\n    }\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Login con contraseña incorrecta  →  401",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 401 Unauthorized', () => pm.response.to.have.status(401));",
+                  "const j = pm.response.json();",
+                  "pm.test('Estructura JSON uniforme (status = \"error\")', () => pm.expect(j.status).to.eql('error'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "auth": {
+              "type": "noauth"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"correo\": \"{{correoPrueba}}\",\n  \"password\": \"Incorrecta#2026\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 401 Unauthorized (base de pruebas local)",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:4000/api/auth/login",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "4000",
+                  "path": [
+                    "api",
+                    "auth",
+                    "login"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"correo\": \"prueba1794533209069@correo.com\",\n  \"password\": \"Incorrecta#2026\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "body": "{\n  \"status\": \"error\",\n  \"message\": \"Correo o contraseña incorrectos\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Login (administrador)  →  200",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 200 OK', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Estructura JSON uniforme (status = \"success\")', () => pm.expect(j.status).to.eql('success'));",
+                  "if (j?.data?.token !== undefined) pm.collectionVariables.set('tokenAdmin', j.data.token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "auth": {
+              "type": "noauth"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"correo\": \"{{correoAdmin}}\",\n  \"password\": \"{{passwordAdmin}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 200 OK (base de pruebas local)",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:4000/api/auth/login",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "4000",
+                  "path": [
+                    "api",
+                    "auth",
+                    "login"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"correo\": \"admin@cafehondureno.hn\",\n  \"password\": \"Admin12345\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "body": "{\n  \"status\": \"success\",\n  \"message\": \"Inicio de sesión exitoso\",\n  \"data\": {\n    \"token\": \"eyJhbGciOiJIUzI1NiIs...(token oculto)\",\n    \"tipo\": \"Bearer\",\n    \"expira_en\": \"1h\",\n    \"usuario\": {\n      \"id\": 1,\n      \"nombre\": \"Administrador\",\n      \"correo\": \"admin@cafehondureno.hn\",\n      \"rol_id\": 1,\n      \"rol\": \"admin\",\n      \"activo\": true,\n      \"creado_en\": \"2026-11-13T01:26:48.984Z\",\n      \"actualizado_en\": \"2026-11-13T01:26:48.984Z\"\n    }\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Perfil sin token  →  401",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 401 Unauthorized', () => pm.response.to.have.status(401));",
+                  "const j = pm.response.json();",
+                  "pm.test('Estructura JSON uniforme (status = \"error\")', () => pm.expect(j.status).to.eql('error'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "noauth"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/perfil",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "perfil"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 401 Unauthorized (base de pruebas local)",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:4000/api/auth/perfil",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "4000",
+                  "path": [
+                    "api",
+                    "auth",
+                    "perfil"
+                  ]
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "body": "{\n  \"status\": \"error\",\n  \"message\": \"Acceso denegado: falta el token. Envía Authorization: Bearer <token>\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Perfil con token inválido  →  401",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 401 Unauthorized', () => pm.response.to.have.status(401));",
+                  "const j = pm.response.json();",
+                  "pm.test('Estructura JSON uniforme (status = \"error\")', () => pm.expect(j.status).to.eql('error'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "token.invalido",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/perfil",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "perfil"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 401 Unauthorized (base de pruebas local)",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:4000/api/auth/perfil",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "4000",
+                  "path": [
+                    "api",
+                    "auth",
+                    "perfil"
+                  ]
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "body": "{\n  \"status\": \"error\",\n  \"message\": \"Token inválido\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Ver mi perfil  →  200",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 200 OK', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Estructura JSON uniforme (status = \"success\")', () => pm.expect(j.status).to.eql('success'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/perfil",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "perfil"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 200 OK (base de pruebas local)",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:4000/api/auth/perfil",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "4000",
+                  "path": [
+                    "api",
+                    "auth",
+                    "perfil"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "body": "{\n  \"status\": \"success\",\n  \"data\": {\n    \"id\": 3,\n    \"nombre\": \"Usuario de Prueba\",\n    \"correo\": \"prueba1794533209069@correo.com\",\n    \"rol_id\": 2,\n    \"rol\": \"usuario\",\n    \"activo\": true,\n    \"creado_en\": \"2026-11-13T01:26:49.092Z\",\n    \"actualizado_en\": \"2026-11-13T01:26:49.092Z\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Actualizar mi perfil  →  200",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 200 OK', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Estructura JSON uniforme (status = \"success\")', () => pm.expect(j.status).to.eql('success'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/perfil",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "perfil"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Usuario de Prueba (editado)\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 200 OK (base de pruebas local)",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:4000/api/auth/perfil",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "4000",
+                  "path": [
+                    "api",
+                    "auth",
+                    "perfil"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"nombre\": \"Usuario de Prueba (editado)\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "body": "{\n  \"status\": \"success\",\n  \"message\": \"Perfil actualizado correctamente\",\n  \"data\": {\n    \"id\": 3,\n    \"nombre\": \"Usuario de Prueba (editado)\",\n    \"correo\": \"prueba1794533209069@correo.com\",\n    \"rol_id\": 2,\n    \"rol\": \"usuario\",\n    \"activo\": true,\n    \"creado_en\": \"2026-11-13T01:26:49.092Z\",\n    \"actualizado_en\": \"2026-11-13T01:26:49.126Z\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Cambiar contraseña  →  200",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 200 OK', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Estructura JSON uniforme (status = \"success\")', () => pm.expect(j.status).to.eql('success'));",
+                  "if (pm.response.code === 200) pm.collectionVariables.set('passwordPrueba', 'Tostador!Lento58');"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/password",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "password"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"password_actual\": \"{{passwordPrueba}}\",\n  \"password_nueva\": \"Tostador!Lento58\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 200 OK (base de pruebas local)",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:4000/api/auth/password",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "4000",
+                  "path": [
+                    "api",
+                    "auth",
+                    "password"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"password_actual\": \"Grano#Rojo2026\",\n  \"password_nueva\": \"Tostador!Lento58\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "body": "{\n  \"status\": \"success\",\n  \"message\": \"Contraseña actualizada correctamente\",\n  \"data\": {\n    \"id\": 3\n  }\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "2. Categorías",
+      "item": [
+        {
+          "name": "Listar categorías de curiosidades  →  200",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 200 OK', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Estructura JSON uniforme (status = \"success\")', () => pm.expect(j.status).to.eql('success'));",
+                  "if (j?.data?.[0]?.id !== undefined) pm.collectionVariables.set('categoriaCuriosidadId', j.data[0].id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "noauth"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/categorias?tipo=curiosidad",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "categorias"
+              ],
+              "query": [
+                {
+                  "key": "tipo",
+                  "value": "curiosidad"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 200 OK (base de pruebas local)",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:4000/api/categorias?tipo=curiosidad",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "4000",
+                  "path": [
+                    "api",
+                    "categorias"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "body": "{\n  \"status\": \"success\",\n  \"data\": [\n    {\n      \"id\": 2,\n      \"nombre\": \"Economía\",\n      \"tipo\": \"curiosidad\"\n    },\n    {\n      \"id\": 1,\n      \"nombre\": \"Historia\",\n      \"tipo\": \"curiosidad\"\n    }\n  ],\n  \"meta\": {\n    \"total\": 2\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Listar con tipo inválido  →  400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 400 Bad Request', () => pm.response.to.have.status(400));",
+                  "const j = pm.response.json();",
+                  "pm.test('Estructura JSON uniforme (status = \"error\")', () => pm.expect(j.status).to.eql('error'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "noauth"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/categorias?tipo=otro",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "categorias"
+              ],
+              "query": [
+                {
+                  "key": "tipo",
+                  "value": "otro"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 400 Bad Request (base de pruebas local)",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:4000/api/categorias?tipo=otro",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "4000",
+                  "path": [
+                    "api",
+                    "categorias"
+                  ]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "body": "{\n  \"status\": \"error\",\n  \"message\": \"El parámetro \\\"tipo\\\" debe ser uno de: curiosidad, galeria\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Ver una categoría  →  200",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 200 OK', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Estructura JSON uniforme (status = \"success\")', () => pm.expect(j.status).to.eql('success'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "noauth"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/categorias/{{categoriaCuriosidadId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "categorias",
+                "{{categoriaCuriosidadId}}"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 200 OK (base de pruebas local)",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:4000/api/categorias/2",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "4000",
+                  "path": [
+                    "api",
+                    "categorias",
+                    "2"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "body": "{\n  \"status\": \"success\",\n  \"data\": {\n    \"id\": 2,\n    \"nombre\": \"Economía\",\n    \"tipo\": \"curiosidad\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Crear categoría sin ser admin  →  403",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 403 Forbidden', () => pm.response.to.have.status(403));",
+                  "const j = pm.response.json();",
+                  "pm.test('Estructura JSON uniforme (status = \"error\")', () => pm.expect(j.status).to.eql('error'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/categorias",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "categorias"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"No permitida\",\n  \"tipo\": \"galeria\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 403 Forbidden (base de pruebas local)",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:4000/api/categorias",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "4000",
+                  "path": [
+                    "api",
+                    "categorias"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"nombre\": \"No permitida\",\n  \"tipo\": \"galeria\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "body": "{\n  \"status\": \"error\",\n  \"message\": \"Solo un administrador puede realizar esta acción\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Crear categoría de galería (admin)  →  201",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('sufijo', String(Date.now()).slice(-6));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 201 Created', () => pm.response.to.have.status(201));",
+                  "const j = pm.response.json();",
+                  "pm.test('Estructura JSON uniforme (status = \"success\")', () => pm.expect(j.status).to.eql('success'));",
+                  "if (j?.data?.id !== undefined) pm.collectionVariables.set('categoriaGaleriaId', j.data.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/categorias",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "categorias"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Prueba {{sufijo}}\",\n  \"tipo\": \"galeria\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 201 Created (base de pruebas local)",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:4000/api/categorias",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "4000",
+                  "path": [
+                    "api",
+                    "categorias"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"nombre\": \"Prueba 209139\",\n  \"tipo\": \"galeria\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "body": "{\n  \"status\": \"success\",\n  \"message\": \"Categoría creada correctamente\",\n  \"data\": {\n    \"id\": 4,\n    \"nombre\": \"Prueba 209139\",\n    \"tipo\": \"galeria\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Actualizar categoría (admin)  →  200",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 200 OK', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Estructura JSON uniforme (status = \"success\")', () => pm.expect(j.status).to.eql('success'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/categorias/{{categoriaGaleriaId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "categorias",
+                "{{categoriaGaleriaId}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Prueba {{sufijo}} (editada)\",\n  \"tipo\": \"galeria\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 200 OK (base de pruebas local)",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:4000/api/categorias/4",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "4000",
+                  "path": [
+                    "api",
+                    "categorias",
+                    "4"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"nombre\": \"Prueba 209139 (editada)\",\n  \"tipo\": \"galeria\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "body": "{\n  \"status\": \"success\",\n  \"message\": \"Categoría actualizada correctamente\",\n  \"data\": {\n    \"id\": 4,\n    \"nombre\": \"Prueba 209139 (editada)\",\n    \"tipo\": \"galeria\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Ver categoría inexistente  →  404",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 404 Not Found', () => pm.response.to.have.status(404));",
+                  "const j = pm.response.json();",
+                  "pm.test('Estructura JSON uniforme (status = \"error\")', () => pm.expect(j.status).to.eql('error'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "noauth"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/categorias/2147483000",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "categorias",
+                "2147483000"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 404 Not Found (base de pruebas local)",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:4000/api/categorias/2147483000",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "4000",
+                  "path": [
+                    "api",
+                    "categorias",
+                    "2147483000"
+                  ]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "body": "{\n  \"status\": \"error\",\n  \"message\": \"Categoría no encontrada\"\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "3. Regiones",
+      "item": [
+        {
+          "name": "Listar regiones  →  200",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 200 OK', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Estructura JSON uniforme (status = \"success\")', () => pm.expect(j.status).to.eql('success'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "noauth"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/regiones",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "regiones"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 200 OK (base de pruebas local)",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:4000/api/regiones",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "4000",
+                  "path": [
+                    "api",
+                    "regiones"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "body": "{\n  \"status\": \"success\",\n  \"data\": [\n    {\n      \"id\": 1,\n      \"nombre\": \"Copán\",\n      \"departamentos\": \"Copán, Ocotepeque\",\n      \"altitud\": \"1,000 - 1,500 msnm\",\n      \"perfil_taza\": \"Chocolate y caramelo\",\n      \"descripcion\": null,\n      \"imagen_url\": null\n    },\n    {\n      \"id\": 2,\n      \"nombre\": \"Montecillos\",\n      \"departamentos\": \"La Paz, Comayagua\",\n      \"altitud\": \"1,200 - 1,600 msnm\",\n      \"perfil_taza\": \"Cítrico y floral\",\n      \"descripcion\": null,\n      \"imagen_url\": null\n    }\n  ],\n  \"meta\": {\n    \"total\": 2\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Crear región (admin)  →  201",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 201 Created', () => pm.response.to.have.status(201));",
+                  "const j = pm.response.json();",
+                  "pm.test('Estructura JSON uniforme (status = \"success\")', () => pm.expect(j.status).to.eql('success'));",
+                  "if (j?.data?.id !== undefined) pm.collectionVariables.set('regionId', j.data.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/regiones",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "regiones"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Región de prueba {{sufijo}}\",\n  \"departamentos\": \"Olancho\",\n  \"altitud\": \"1,000 - 1,400 msnm\",\n  \"perfil_taza\": \"Notas tropicales y cuerpo medio\",\n  \"descripcion\": \"Región creada por la colección de pruebas.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 201 Created (base de pruebas local)",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:4000/api/regiones",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "4000",
+                  "path": [
+                    "api",
+                    "regiones"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"nombre\": \"Región de prueba 209139\",\n  \"departamentos\": \"Olancho\",\n  \"altitud\": \"1,000 - 1,400 msnm\",\n  \"perfil_taza\": \"Notas tropicales y cuerpo medio\",\n  \"descripcion\": \"Región creada por la colección de pruebas.\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "body": "{\n  \"status\": \"success\",\n  \"message\": \"Región creada correctamente\",\n  \"data\": {\n    \"id\": 3,\n    \"nombre\": \"Región de prueba 209139\",\n    \"departamentos\": \"Olancho\",\n    \"altitud\": \"1,000 - 1,400 msnm\",\n    \"perfil_taza\": \"Notas tropicales y cuerpo medio\",\n    \"descripcion\": \"Región creada por la colección de pruebas.\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Crear región repetida  →  409",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 409 Conflict', () => pm.response.to.have.status(409));",
+                  "const j = pm.response.json();",
+                  "pm.test('Estructura JSON uniforme (status = \"error\")', () => pm.expect(j.status).to.eql('error'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/regiones",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "regiones"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Región de prueba {{sufijo}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 409 Conflict (base de pruebas local)",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:4000/api/regiones",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "4000",
+                  "path": [
+                    "api",
+                    "regiones"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"nombre\": \"Región de prueba 209139\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Conflict",
+              "code": 409,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "body": "{\n  \"status\": \"error\",\n  \"message\": \"Ya existe la región \\\"Región de prueba 209139\\\"\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Actualizar región (admin)  →  200",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 200 OK', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Estructura JSON uniforme (status = \"success\")', () => pm.expect(j.status).to.eql('success'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/regiones/{{regionId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "regiones",
+                "{{regionId}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Región de prueba {{sufijo}}\",\n  \"departamentos\": \"Olancho, El Paraíso\",\n  \"perfil_taza\": \"Frutal y achocolatado\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 200 OK (base de pruebas local)",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:4000/api/regiones/3",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "4000",
+                  "path": [
+                    "api",
+                    "regiones",
+                    "3"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"nombre\": \"Región de prueba 209139\",\n  \"departamentos\": \"Olancho, El Paraíso\",\n  \"perfil_taza\": \"Frutal y achocolatado\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "body": "{\n  \"status\": \"success\",\n  \"message\": \"Región actualizada correctamente\",\n  \"data\": {\n    \"id\": 3,\n    \"nombre\": \"Región de prueba 209139\",\n    \"departamentos\": \"Olancho, El Paraíso\",\n    \"altitud\": null,\n    \"perfil_taza\": \"Frutal y achocolatado\",\n    \"descripcion\": null,\n    \"imagen_url\": null\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Ver una región  →  200",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 200 OK', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Estructura JSON uniforme (status = \"success\")', () => pm.expect(j.status).to.eql('success'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "noauth"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/regiones/{{regionId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "regiones",
+                "{{regionId}}"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 200 OK (base de pruebas local)",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:4000/api/regiones/3",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "4000",
+                  "path": [
+                    "api",
+                    "regiones",
+                    "3"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "body": "{\n  \"status\": \"success\",\n  \"data\": {\n    \"id\": 3,\n    \"nombre\": \"Región de prueba 209139\",\n    \"departamentos\": \"Olancho, El Paraíso\",\n    \"altitud\": null,\n    \"perfil_taza\": \"Frutal y achocolatado\",\n    \"descripcion\": null,\n    \"imagen_url\": null\n  }\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "4. Curiosidades (CRUD principal)",
+      "item": [
+        {
+          "name": "Listar curiosidades  →  200",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 200 OK', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Estructura JSON uniforme (status = \"success\")', () => pm.expect(j.status).to.eql('success'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "noauth"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/curiosidades?page=1&limit=5",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "curiosidades"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "5"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 200 OK (base de pruebas local)",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:4000/api/curiosidades?page=1&limit=5",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "4000",
+                  "path": [
+                    "api",
+                    "curiosidades"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "body": "{\n  \"status\": \"success\",\n  \"data\": [],\n  \"meta\": {\n    \"total\": 0,\n    \"page\": 1,\n    \"limit\": 5,\n    \"totalPages\": 0\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Crear curiosidad sin token  →  401",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 401 Unauthorized', () => pm.response.to.have.status(401));",
+                  "const j = pm.response.json();",
+                  "pm.test('Estructura JSON uniforme (status = \"error\")', () => pm.expect(j.status).to.eql('error'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "auth": {
+              "type": "noauth"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/curiosidades",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "curiosidades"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"titulo\": \"Sin token\",\n  \"descripcion\": \"No debe guardarse\",\n  \"categoria_id\": {{categoriaCuriosidadId}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 401 Unauthorized (base de pruebas local)",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:4000/api/curiosidades",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "4000",
+                  "path": [
+                    "api",
+                    "curiosidades"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"titulo\": \"Sin token\",\n  \"descripcion\": \"No debe guardarse\",\n  \"categoria_id\": 2\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "body": "{\n  \"status\": \"error\",\n  \"message\": \"Acceso denegado: falta el token. Envía Authorization: Bearer <token>\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Crear curiosidad con datos inválidos  →  400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 400 Bad Request', () => pm.response.to.have.status(400));",
+                  "const j = pm.response.json();",
+                  "pm.test('Estructura JSON uniforme (status = \"error\")', () => pm.expect(j.status).to.eql('error'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/curiosidades",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "curiosidades"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 400 Bad Request (base de pruebas local)",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:4000/api/curiosidades",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "4000",
+                  "path": [
+                    "api",
+                    "curiosidades"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "body": "{\n  \"status\": \"error\",\n  \"message\": \"Datos inválidos\",\n  \"errors\": [\n    {\n      \"campo\": \"titulo\",\n      \"mensaje\": \"El título es obligatorio y debe ser texto\"\n    },\n    {\n      \"campo\": \"descripcion\",\n      \"mensaje\": \"La descripción es obligatoria y debe ser texto\"\n    },\n    {\n      \"campo\": \"categoria_id\",\n      \"mensaje\": \"La categoría es obligatoria y debe ser un id válido\"\n    }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "Crear curiosidad  →  201",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 201 Created', () => pm.response.to.have.status(201));",
+                  "const j = pm.response.json();",
+                  "pm.test('Estructura JSON uniforme (status = \"success\")', () => pm.expect(j.status).to.eql('success'));",
+                  "if (j?.data?.id !== undefined) pm.collectionVariables.set('curiosidadId', j.data.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/curiosidades",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "curiosidades"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"titulo\": \"[PRUEBA] El café nace dentro de una cereza\",\n  \"descripcion\": \"Cada cereza de café guarda normalmente dos semillas: los granos que luego se tuestan.\",\n  \"categoria_id\": {{categoriaCuriosidadId}},\n  \"region_id\": {{regionId}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 201 Created (base de pruebas local)",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:4000/api/curiosidades",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "4000",
+                  "path": [
+                    "api",
+                    "curiosidades"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"titulo\": \"[PRUEBA] El café nace dentro de una cereza\",\n  \"descripcion\": \"Cada cereza de café guarda normalmente dos semillas: los granos que luego se tuestan.\",\n  \"categoria_id\": 2,\n  \"region_id\": 3\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "body": "{\n  \"status\": \"success\",\n  \"message\": \"Curiosidad creada correctamente\",\n  \"data\": {\n    \"id\": 1,\n    \"titulo\": \"[PRUEBA] El café nace dentro de una cereza\",\n    \"descripcion\": \"Cada cereza de café guarda normalmente dos semillas: los granos que luego se tuestan.\",\n    \"categoria_id\": 2,\n    \"region_id\": 3,\n    \"creado_por\": 3,\n    \"creado_en\": \"2026-11-13T01:26:49.163Z\",\n    \"actualizado_en\": \"2026-11-13T01:26:49.163Z\",\n    \"categoria\": {\n      \"id\": 2,\n      \"nombre\": \"Economía\",\n      \"tipo\": \"curiosidad\"\n    },\n    \"region\": {\n      \"id\": 3,\n      \"nombre\": \"Región de prueba 209139\"\n    },\n    \"autor\": {\n      \"id\": 3,\n      \"nombre\": \"Usuario de Prueba (editado)\"\n    }\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Ver una curiosidad  →  200",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 200 OK', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Estructura JSON uniforme (status = \"success\")', () => pm.expect(j.status).to.eql('success'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "noauth"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/curiosidades/{{curiosidadId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "curiosidades",
+                "{{curiosidadId}}"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 200 OK (base de pruebas local)",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:4000/api/curiosidades/1",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "4000",
+                  "path": [
+                    "api",
+                    "curiosidades",
+                    "1"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "body": "{\n  \"status\": \"success\",\n  \"data\": {\n    \"id\": 1,\n    \"titulo\": \"[PRUEBA] El café nace dentro de una cereza\",\n    \"descripcion\": \"Cada cereza de café guarda normalmente dos semillas: los granos que luego se tuestan.\",\n    \"categoria_id\": 2,\n    \"region_id\": 3,\n    \"creado_por\": 3,\n    \"creado_en\": \"2026-11-13T01:26:49.163Z\",\n    \"actualizado_en\": \"2026-11-13T01:26:49.163Z\",\n    \"categoria\": {\n      \"id\": 2,\n      \"nombre\": \"Economía\",\n      \"tipo\": \"curiosidad\"\n    },\n    \"region\": {\n      \"id\": 3,\n      \"nombre\": \"Región de prueba 209139\"\n    },\n    \"autor\": {\n      \"id\": 3,\n      \"nombre\": \"Usuario de Prueba (editado)\"\n    }\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Buscar por texto  →  200",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 200 OK', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Estructura JSON uniforme (status = \"success\")', () => pm.expect(j.status).to.eql('success'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "noauth"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/curiosidades?q=cereza",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "curiosidades"
+              ],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "cereza"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 200 OK (base de pruebas local)",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:4000/api/curiosidades?q=cereza",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "4000",
+                  "path": [
+                    "api",
+                    "curiosidades"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "body": "{\n  \"status\": \"success\",\n  \"data\": [\n    {\n      \"id\": 1,\n      \"titulo\": \"[PRUEBA] El café nace dentro de una cereza\",\n      \"descripcion\": \"Cada cereza de café guarda normalmente dos semillas: los granos que luego se tuestan.\",\n      \"categoria_id\": 2,\n      \"region_id\": 3,\n      \"creado_por\": 3,\n      \"creado_en\": \"2026-11-13T01:26:49.163Z\",\n      \"actualizado_en\": \"2026-11-13T01:26:49.163Z\",\n      \"categoria\": {\n        \"id\": 2,\n        \"nombre\": \"Economía\",\n        \"tipo\": \"curiosidad\"\n      },\n      \"region\": {\n        \"id\": 3,\n        \"nombre\": \"Región de prueba 209139\"\n      },\n      \"autor\": {\n        \"id\": 3,\n        \"nombre\": \"Usuario de Prueba (editado)\"\n      }\n    }\n  ],\n  \"meta\": {\n    \"total\": 1,\n    \"page\": 1,\n    \"limit\": 10,\n    \"totalPages\": 1\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Actualizar completa (PUT)  →  200",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 200 OK', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Estructura JSON uniforme (status = \"success\")', () => pm.expect(j.status).to.eql('success'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/curiosidades/{{curiosidadId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "curiosidades",
+                "{{curiosidadId}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"titulo\": \"[PRUEBA] Título actualizado con PUT\",\n  \"descripcion\": \"PUT reemplaza todos los campos; la región queda en null si no se envía.\",\n  \"categoria_id\": {{categoriaCuriosidadId}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 200 OK (base de pruebas local)",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:4000/api/curiosidades/1",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "4000",
+                  "path": [
+                    "api",
+                    "curiosidades",
+                    "1"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"titulo\": \"[PRUEBA] Título actualizado con PUT\",\n  \"descripcion\": \"PUT reemplaza todos los campos; la región queda en null si no se envía.\",\n  \"categoria_id\": 2\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "body": "{\n  \"status\": \"success\",\n  \"message\": \"Curiosidad actualizada correctamente\",\n  \"data\": {\n    \"id\": 1,\n    \"titulo\": \"[PRUEBA] Título actualizado con PUT\",\n    \"descripcion\": \"PUT reemplaza todos los campos; la región queda en null si no se envía.\",\n    \"categoria_id\": 2,\n    \"region_id\": null,\n    \"creado_por\": 3,\n    \"creado_en\": \"2026-11-13T01:26:49.163Z\",\n    \"actualizado_en\": \"2026-11-13T01:26:49.172Z\",\n    \"categoria\": {\n      \"id\": 2,\n      \"nombre\": \"Economía\",\n      \"tipo\": \"curiosidad\"\n    },\n    \"region\": null,\n    \"autor\": {\n      \"id\": 3,\n      \"nombre\": \"Usuario de Prueba (editado)\"\n    }\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Actualizar parcial (PATCH)  →  200",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 200 OK', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Estructura JSON uniforme (status = \"success\")', () => pm.expect(j.status).to.eql('success'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/curiosidades/{{curiosidadId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "curiosidades",
+                "{{curiosidadId}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"titulo\": \"[PRUEBA] Título cambiado con PATCH\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 200 OK (base de pruebas local)",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:4000/api/curiosidades/1",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "4000",
+                  "path": [
+                    "api",
+                    "curiosidades",
+                    "1"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"titulo\": \"[PRUEBA] Título cambiado con PATCH\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "body": "{\n  \"status\": \"success\",\n  \"message\": \"Curiosidad actualizada correctamente\",\n  \"data\": {\n    \"id\": 1,\n    \"titulo\": \"[PRUEBA] Título cambiado con PATCH\",\n    \"descripcion\": \"PUT reemplaza todos los campos; la región queda en null si no se envía.\",\n    \"categoria_id\": 2,\n    \"region_id\": null,\n    \"creado_por\": 3,\n    \"creado_en\": \"2026-11-13T01:26:49.163Z\",\n    \"actualizado_en\": \"2026-11-13T01:26:49.176Z\",\n    \"categoria\": {\n      \"id\": 2,\n      \"nombre\": \"Economía\",\n      \"tipo\": \"curiosidad\"\n    },\n    \"region\": null,\n    \"autor\": {\n      \"id\": 3,\n      \"nombre\": \"Usuario de Prueba (editado)\"\n    }\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "PATCH sin campos  →  400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 400 Bad Request', () => pm.response.to.have.status(400));",
+                  "const j = pm.response.json();",
+                  "pm.test('Estructura JSON uniforme (status = \"error\")', () => pm.expect(j.status).to.eql('error'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/curiosidades/{{curiosidadId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "curiosidades",
+                "{{curiosidadId}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 400 Bad Request (base de pruebas local)",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:4000/api/curiosidades/1",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "4000",
+                  "path": [
+                    "api",
+                    "curiosidades",
+                    "1"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "body": "{\n  \"status\": \"error\",\n  \"message\": \"Debes enviar al menos un campo para actualizar: titulo, descripcion, categoria_id o region_id\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Eliminar curiosidad  →  200",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 200 OK', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Estructura JSON uniforme (status = \"success\")', () => pm.expect(j.status).to.eql('success'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/curiosidades/{{curiosidadId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "curiosidades",
+                "{{curiosidadId}}"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 200 OK (base de pruebas local)",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:4000/api/curiosidades/1",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "4000",
+                  "path": [
+                    "api",
+                    "curiosidades",
+                    "1"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "body": "{\n  \"status\": \"success\",\n  \"message\": \"Curiosidad eliminada correctamente\",\n  \"data\": {\n    \"id\": 1\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Ver curiosidad eliminada  →  404",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 404 Not Found', () => pm.response.to.have.status(404));",
+                  "const j = pm.response.json();",
+                  "pm.test('Estructura JSON uniforme (status = \"error\")', () => pm.expect(j.status).to.eql('error'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "noauth"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/curiosidades/{{curiosidadId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "curiosidades",
+                "{{curiosidadId}}"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 404 Not Found (base de pruebas local)",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:4000/api/curiosidades/1",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "4000",
+                  "path": [
+                    "api",
+                    "curiosidades",
+                    "1"
+                  ]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "body": "{\n  \"status\": \"error\",\n  \"message\": \"Curiosidad no encontrada\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Id con formato inválido  →  400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 400 Bad Request', () => pm.response.to.have.status(400));",
+                  "const j = pm.response.json();",
+                  "pm.test('Estructura JSON uniforme (status = \"error\")', () => pm.expect(j.status).to.eql('error'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "noauth"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/curiosidades/abc",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "curiosidades",
+                "abc"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 400 Bad Request (base de pruebas local)",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:4000/api/curiosidades/abc",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "4000",
+                  "path": [
+                    "api",
+                    "curiosidades",
+                    "abc"
+                  ]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "body": "{\n  \"status\": \"error\",\n  \"message\": \"El id debe ser un número entero positivo\"\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "5. Galería",
+      "item": [
+        {
+          "name": "Listar fotos  →  200",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 200 OK', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Estructura JSON uniforme (status = \"success\")', () => pm.expect(j.status).to.eql('success'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "noauth"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/galeria?page=1&limit=12",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "galeria"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "12"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 200 OK (base de pruebas local)",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:4000/api/galeria?page=1&limit=12",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "4000",
+                  "path": [
+                    "api",
+                    "galeria"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "body": "{\n  \"status\": \"success\",\n  \"data\": [],\n  \"meta\": {\n    \"total\": 0,\n    \"page\": 1,\n    \"limit\": 12,\n    \"totalPages\": 0\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Subir foto sin ser admin  →  403",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 403 Forbidden', () => pm.response.to.have.status(403));",
+                  "const j = pm.response.json();",
+                  "pm.test('Estructura JSON uniforme (status = \"error\")', () => pm.expect(j.status).to.eql('error'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/galeria",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "galeria"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"titulo\": \"No permitida\",\n  \"imagen_url\": \"imagenes/cafe.jpg\",\n  \"categoria_id\": {{categoriaGaleriaId}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 403 Forbidden (base de pruebas local)",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:4000/api/galeria",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "4000",
+                  "path": [
+                    "api",
+                    "galeria"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"titulo\": \"No permitida\",\n  \"imagen_url\": \"imagenes/cafe.jpg\",\n  \"categoria_id\": 4\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "body": "{\n  \"status\": \"error\",\n  \"message\": \"Solo un administrador puede realizar esta acción\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Subir foto (admin)  →  201",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 201 Created', () => pm.response.to.have.status(201));",
+                  "const j = pm.response.json();",
+                  "pm.test('Estructura JSON uniforme (status = \"success\")', () => pm.expect(j.status).to.eql('success'));",
+                  "if (j?.data?.id !== undefined) pm.collectionVariables.set('fotoId', j.data.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/galeria",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "galeria"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"titulo\": \"[PRUEBA] Cafetal al amanecer\",\n  \"descripcion\": \"Foto de prueba creada por la colección.\",\n  \"imagen_url\": \"imagenes/marcala.jpg\",\n  \"categoria_id\": {{categoriaGaleriaId}},\n  \"region_id\": {{regionId}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 201 Created (base de pruebas local)",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:4000/api/galeria",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "4000",
+                  "path": [
+                    "api",
+                    "galeria"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"titulo\": \"[PRUEBA] Cafetal al amanecer\",\n  \"descripcion\": \"Foto de prueba creada por la colección.\",\n  \"imagen_url\": \"imagenes/marcala.jpg\",\n  \"categoria_id\": 4,\n  \"region_id\": 3\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "body": "{\n  \"status\": \"success\",\n  \"message\": \"Foto creada correctamente\",\n  \"data\": {\n    \"id\": 1,\n    \"titulo\": \"[PRUEBA] Cafetal al amanecer\",\n    \"descripcion\": \"Foto de prueba creada por la colección.\",\n    \"imagen_url\": \"imagenes/marcala.jpg\",\n    \"categoria_id\": 4,\n    \"region_id\": 3,\n    \"subido_por\": 1,\n    \"creado_en\": \"2026-11-13T01:26:49.192Z\",\n    \"categoria\": {\n      \"id\": 4,\n      \"nombre\": \"Prueba 209139 (editada)\",\n      \"tipo\": \"galeria\"\n    },\n    \"region\": {\n      \"id\": 3,\n      \"nombre\": \"Región de prueba 209139\"\n    },\n    \"autor\": {\n      \"id\": 1,\n      \"nombre\": \"Administrador\"\n    }\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Ver una foto  →  200",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 200 OK', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Estructura JSON uniforme (status = \"success\")', () => pm.expect(j.status).to.eql('success'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "noauth"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/galeria/{{fotoId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "galeria",
+                "{{fotoId}}"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 200 OK (base de pruebas local)",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:4000/api/galeria/1",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "4000",
+                  "path": [
+                    "api",
+                    "galeria",
+                    "1"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "body": "{\n  \"status\": \"success\",\n  \"data\": {\n    \"id\": 1,\n    \"titulo\": \"[PRUEBA] Cafetal al amanecer\",\n    \"descripcion\": \"Foto de prueba creada por la colección.\",\n    \"imagen_url\": \"imagenes/marcala.jpg\",\n    \"categoria_id\": 4,\n    \"region_id\": 3,\n    \"subido_por\": 1,\n    \"creado_en\": \"2026-11-13T01:26:49.192Z\",\n    \"categoria\": {\n      \"id\": 4,\n      \"nombre\": \"Prueba 209139 (editada)\",\n      \"tipo\": \"galeria\"\n    },\n    \"region\": {\n      \"id\": 3,\n      \"nombre\": \"Región de prueba 209139\"\n    },\n    \"autor\": {\n      \"id\": 1,\n      \"nombre\": \"Administrador\"\n    }\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Actualizar foto (admin)  →  200",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 200 OK', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Estructura JSON uniforme (status = \"success\")', () => pm.expect(j.status).to.eql('success'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/galeria/{{fotoId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "galeria",
+                "{{fotoId}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"titulo\": \"[PRUEBA] Cafetal (editada)\",\n  \"imagen_url\": \"https://ejemplo.com/cafetal.jpg\",\n  \"categoria_id\": {{categoriaGaleriaId}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 200 OK (base de pruebas local)",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:4000/api/galeria/1",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "4000",
+                  "path": [
+                    "api",
+                    "galeria",
+                    "1"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"titulo\": \"[PRUEBA] Cafetal (editada)\",\n  \"imagen_url\": \"https://ejemplo.com/cafetal.jpg\",\n  \"categoria_id\": 4\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "body": "{\n  \"status\": \"success\",\n  \"message\": \"Foto actualizada correctamente\",\n  \"data\": {\n    \"id\": 1,\n    \"titulo\": \"[PRUEBA] Cafetal (editada)\",\n    \"descripcion\": null,\n    \"imagen_url\": \"https://ejemplo.com/cafetal.jpg\",\n    \"categoria_id\": 4,\n    \"region_id\": null,\n    \"subido_por\": 1,\n    \"creado_en\": \"2026-11-13T01:26:49.192Z\",\n    \"categoria\": {\n      \"id\": 4,\n      \"nombre\": \"Prueba 209139 (editada)\",\n      \"tipo\": \"galeria\"\n    },\n    \"region\": null,\n    \"autor\": {\n      \"id\": 1,\n      \"nombre\": \"Administrador\"\n    }\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Eliminar foto (admin)  →  200",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 200 OK', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Estructura JSON uniforme (status = \"success\")', () => pm.expect(j.status).to.eql('success'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/galeria/{{fotoId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "galeria",
+                "{{fotoId}}"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 200 OK (base de pruebas local)",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:4000/api/galeria/1",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "4000",
+                  "path": [
+                    "api",
+                    "galeria",
+                    "1"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "body": "{\n  \"status\": \"success\",\n  \"message\": \"Foto eliminada correctamente\",\n  \"data\": {\n    \"id\": 1\n  }\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "6. Contacto",
+      "item": [
+        {
+          "name": "Enviar mensaje (visitante)  →  201",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 201 Created', () => pm.response.to.have.status(201));",
+                  "const j = pm.response.json();",
+                  "pm.test('Estructura JSON uniforme (status = \"success\")', () => pm.expect(j.status).to.eql('success'));",
+                  "if (j?.data?.id !== undefined) pm.collectionVariables.set('mensajeId', j.data.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "auth": {
+              "type": "noauth"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/contacto",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "contacto"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Visitante de prueba\",\n  \"correo\": \"visitante@correo.com\",\n  \"asunto\": \"informacion\",\n  \"mensaje\": \"[PRUEBA] ¿Dónde puedo comprar café de Marcala?\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 201 Created (base de pruebas local)",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:4000/api/contacto",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "4000",
+                  "path": [
+                    "api",
+                    "contacto"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"nombre\": \"Visitante de prueba\",\n  \"correo\": \"visitante@correo.com\",\n  \"asunto\": \"informacion\",\n  \"mensaje\": \"[PRUEBA] ¿Dónde puedo comprar café de Marcala?\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "body": "{\n  \"status\": \"success\",\n  \"message\": \"Mensaje enviado correctamente. ¡Gracias por escribirnos!\",\n  \"data\": {\n    \"id\": 1,\n    \"nombre\": \"Visitante de prueba\",\n    \"correo\": \"visitante@correo.com\",\n    \"asunto\": \"informacion\",\n    \"mensaje\": \"[PRUEBA] ¿Dónde puedo comprar café de Marcala?\",\n    \"usuario_id\": null,\n    \"leido\": false,\n    \"creado_en\": \"2026-11-13T01:26:49.205Z\",\n    \"usuario\": null\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Enviar mensaje con datos inválidos  →  400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 400 Bad Request', () => pm.response.to.have.status(400));",
+                  "const j = pm.response.json();",
+                  "pm.test('Estructura JSON uniforme (status = \"error\")', () => pm.expect(j.status).to.eql('error'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "auth": {
+              "type": "noauth"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/contacto",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "contacto"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"\",\n  \"correo\": \"x\",\n  \"asunto\": \"queja\",\n  \"mensaje\": \"\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 400 Bad Request (base de pruebas local)",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:4000/api/contacto",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "4000",
+                  "path": [
+                    "api",
+                    "contacto"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"nombre\": \"\",\n  \"correo\": \"x\",\n  \"asunto\": \"queja\",\n  \"mensaje\": \"\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "body": "{\n  \"status\": \"error\",\n  \"message\": \"Datos inválidos\",\n  \"errors\": [\n    {\n      \"campo\": \"nombre\",\n      \"mensaje\": \"El nombre es obligatorio y debe ser texto\"\n    },\n    {\n      \"campo\": \"correo\",\n      \"mensaje\": \"El correo no tiene un formato válido\"\n    },\n    {\n      \"campo\": \"asunto\",\n      \"mensaje\": \"El asunto debe ser uno de: informacion, productos, sugerencia, otro\"\n    },\n    {\n      \"campo\": \"mensaje\",\n      \"mensaje\": \"El mensaje es obligatorio y debe ser texto\"\n    }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "Bandeja sin ser admin  →  403",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 403 Forbidden', () => pm.response.to.have.status(403));",
+                  "const j = pm.response.json();",
+                  "pm.test('Estructura JSON uniforme (status = \"error\")', () => pm.expect(j.status).to.eql('error'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/contacto",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "contacto"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 403 Forbidden (base de pruebas local)",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:4000/api/contacto",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "4000",
+                  "path": [
+                    "api",
+                    "contacto"
+                  ]
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "body": "{\n  \"status\": \"error\",\n  \"message\": \"Solo un administrador puede realizar esta acción\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Bandeja de mensajes (admin)  →  200",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 200 OK', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Estructura JSON uniforme (status = \"success\")', () => pm.expect(j.status).to.eql('success'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/contacto?leido=false",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "contacto"
+              ],
+              "query": [
+                {
+                  "key": "leido",
+                  "value": "false"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 200 OK (base de pruebas local)",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:4000/api/contacto?leido=false",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "4000",
+                  "path": [
+                    "api",
+                    "contacto"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "body": "{\n  \"status\": \"success\",\n  \"data\": [\n    {\n      \"id\": 1,\n      \"nombre\": \"Visitante de prueba\",\n      \"correo\": \"visitante@correo.com\",\n      \"asunto\": \"informacion\",\n      \"mensaje\": \"[PRUEBA] ¿Dónde puedo comprar café de Marcala?\",\n      \"usuario_id\": null,\n      \"leido\": false,\n      \"creado_en\": \"2026-11-13T01:26:49.205Z\",\n      \"usuario\": null\n    }\n  ],\n  \"meta\": {\n    \"total\": 1,\n    \"page\": 1,\n    \"limit\": 10,\n    \"totalPages\": 1,\n    \"sinLeer\": 1\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Ver un mensaje (admin)  →  200",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 200 OK', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Estructura JSON uniforme (status = \"success\")', () => pm.expect(j.status).to.eql('success'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/contacto/{{mensajeId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "contacto",
+                "{{mensajeId}}"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 200 OK (base de pruebas local)",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:4000/api/contacto/1",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "4000",
+                  "path": [
+                    "api",
+                    "contacto",
+                    "1"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "body": "{\n  \"status\": \"success\",\n  \"data\": {\n    \"id\": 1,\n    \"nombre\": \"Visitante de prueba\",\n    \"correo\": \"visitante@correo.com\",\n    \"asunto\": \"informacion\",\n    \"mensaje\": \"[PRUEBA] ¿Dónde puedo comprar café de Marcala?\",\n    \"usuario_id\": null,\n    \"leido\": false,\n    \"creado_en\": \"2026-11-13T01:26:49.205Z\",\n    \"usuario\": null\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Marcar como leído (admin)  →  200",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 200 OK', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Estructura JSON uniforme (status = \"success\")', () => pm.expect(j.status).to.eql('success'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/contacto/{{mensajeId}}/leido",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "contacto",
+                "{{mensajeId}}",
+                "leido"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"leido\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 200 OK (base de pruebas local)",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:4000/api/contacto/1/leido",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "4000",
+                  "path": [
+                    "api",
+                    "contacto",
+                    "1",
+                    "leido"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"leido\": true\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "body": "{\n  \"status\": \"success\",\n  \"message\": \"Mensaje marcado como leído\",\n  \"data\": {\n    \"id\": 1,\n    \"nombre\": \"Visitante de prueba\",\n    \"correo\": \"visitante@correo.com\",\n    \"asunto\": \"informacion\",\n    \"mensaje\": \"[PRUEBA] ¿Dónde puedo comprar café de Marcala?\",\n    \"usuario_id\": null,\n    \"leido\": true,\n    \"creado_en\": \"2026-11-13T01:26:49.205Z\",\n    \"usuario\": null\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Eliminar mensaje (admin)  →  200",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 200 OK', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Estructura JSON uniforme (status = \"success\")', () => pm.expect(j.status).to.eql('success'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/contacto/{{mensajeId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "contacto",
+                "{{mensajeId}}"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 200 OK (base de pruebas local)",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:4000/api/contacto/1",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "4000",
+                  "path": [
+                    "api",
+                    "contacto",
+                    "1"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "body": "{\n  \"status\": \"success\",\n  \"message\": \"Mensaje eliminado correctamente\",\n  \"data\": {\n    \"id\": 1\n  }\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "7. Usuarios (admin)",
+      "item": [
+        {
+          "name": "Listar usuarios (admin)  →  200",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 200 OK', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Estructura JSON uniforme (status = \"success\")', () => pm.expect(j.status).to.eql('success'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/usuarios?page=1&limit=10",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "usuarios"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 200 OK (base de pruebas local)",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:4000/api/usuarios?page=1&limit=10",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "4000",
+                  "path": [
+                    "api",
+                    "usuarios"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "body": "{\n  \"status\": \"success\",\n  \"data\": [\n    {\n      \"id\": 1,\n      \"nombre\": \"Administrador\",\n      \"correo\": \"admin@cafehondureno.hn\",\n      \"rol_id\": 1,\n      \"rol\": \"admin\",\n      \"activo\": true,\n      \"creado_en\": \"2026-11-13T01:26:48.984Z\",\n      \"actualizado_en\": \"2026-11-13T01:26:48.984Z\"\n    },\n    {\n      \"id\": 2,\n      \"nombre\": \"María López\",\n      \"correo\": \"maria@cafehondureno.hn\",\n      \"rol_id\": 2,\n      \"rol\": \"usuario\",\n      \"activo\": true,\n      \"creado_en\": \"2026-11-13T01:26:48.984Z\",\n      \"actualizado_en\": \"2026-11-13T01:26:48.984Z\"\n    },\n    {\n      \"id\": 3,\n      \"nombre\": \"Usuario de Prueba (editado)\",\n      \"correo\": \"prueba1794533209069@correo.com\",\n      \"rol_id\": 2,\n      \"rol\": \"usuario\",\n      \"activo\": true,\n      \"creado_en\": \"2026-11-13T01:26:49.092Z\",\n      \"actualizado_en\": \"2026-11-13T01:26:49.132Z\"\n    }\n  ],\n  \"meta\": {\n    \"total\": 3,\n    \"page\": 1,\n    \"limit\": 10,\n    \"totalPages\": 1\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Listar usuarios sin ser admin  →  403",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 403 Forbidden', () => pm.response.to.have.status(403));",
+                  "const j = pm.response.json();",
+                  "pm.test('Estructura JSON uniforme (status = \"error\")', () => pm.expect(j.status).to.eql('error'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/usuarios",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "usuarios"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 403 Forbidden (base de pruebas local)",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:4000/api/usuarios",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "4000",
+                  "path": [
+                    "api",
+                    "usuarios"
+                  ]
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "body": "{\n  \"status\": \"error\",\n  \"message\": \"Solo un administrador puede realizar esta acción\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Ver un usuario (admin)  →  200",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 200 OK', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Estructura JSON uniforme (status = \"success\")', () => pm.expect(j.status).to.eql('success'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/usuarios/{{usuarioPruebaId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "usuarios",
+                "{{usuarioPruebaId}}"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 200 OK (base de pruebas local)",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:4000/api/usuarios/3",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "4000",
+                  "path": [
+                    "api",
+                    "usuarios",
+                    "3"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "body": "{\n  \"status\": \"success\",\n  \"data\": {\n    \"id\": 3,\n    \"nombre\": \"Usuario de Prueba (editado)\",\n    \"correo\": \"prueba1794533209069@correo.com\",\n    \"rol_id\": 2,\n    \"rol\": \"usuario\",\n    \"activo\": true,\n    \"creado_en\": \"2026-11-13T01:26:49.092Z\",\n    \"actualizado_en\": \"2026-11-13T01:26:49.132Z\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Desactivar usuario (admin)  →  200",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 200 OK', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Estructura JSON uniforme (status = \"success\")', () => pm.expect(j.status).to.eql('success'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/usuarios/{{usuarioPruebaId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "usuarios",
+                "{{usuarioPruebaId}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"activo\": false\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 200 OK (base de pruebas local)",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:4000/api/usuarios/3",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "4000",
+                  "path": [
+                    "api",
+                    "usuarios",
+                    "3"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"activo\": false\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "body": "{\n  \"status\": \"success\",\n  \"message\": \"Usuario actualizado correctamente\",\n  \"data\": {\n    \"id\": 3,\n    \"nombre\": \"Usuario de Prueba (editado)\",\n    \"correo\": \"prueba1794533209069@correo.com\",\n    \"rol_id\": 2,\n    \"rol\": \"usuario\",\n    \"activo\": false,\n    \"creado_en\": \"2026-11-13T01:26:49.092Z\",\n    \"actualizado_en\": \"2026-11-13T01:26:49.227Z\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Login de usuario desactivado  →  403",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 403 Forbidden', () => pm.response.to.have.status(403));",
+                  "const j = pm.response.json();",
+                  "pm.test('Estructura JSON uniforme (status = \"error\")', () => pm.expect(j.status).to.eql('error'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "auth": {
+              "type": "noauth"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"correo\": \"{{correoPrueba}}\",\n  \"password\": \"{{passwordPrueba}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 403 Forbidden (base de pruebas local)",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:4000/api/auth/login",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "4000",
+                  "path": [
+                    "api",
+                    "auth",
+                    "login"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"correo\": \"prueba1794533209069@correo.com\",\n  \"password\": \"Tostador!Lento58\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "body": "{\n  \"status\": \"error\",\n  \"message\": \"La cuenta está desactivada. Contacta al administrador\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Reactivar usuario (admin)  →  200",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 200 OK', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Estructura JSON uniforme (status = \"success\")', () => pm.expect(j.status).to.eql('success'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/usuarios/{{usuarioPruebaId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "usuarios",
+                "{{usuarioPruebaId}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"activo\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 200 OK (base de pruebas local)",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "http://localhost:4000/api/usuarios/3",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "4000",
+                  "path": [
+                    "api",
+                    "usuarios",
+                    "3"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"activo\": true\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "body": "{\n  \"status\": \"success\",\n  \"message\": \"Usuario actualizado correctamente\",\n  \"data\": {\n    \"id\": 3,\n    \"nombre\": \"Usuario de Prueba (editado)\",\n    \"correo\": \"prueba1794533209069@correo.com\",\n    \"rol_id\": 2,\n    \"rol\": \"usuario\",\n    \"activo\": true,\n    \"creado_en\": \"2026-11-13T01:26:49.092Z\",\n    \"actualizado_en\": \"2026-11-13T01:26:49.235Z\"\n  }\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "8. Limpieza y cierre de sesión",
+      "item": [
+        {
+          "name": "Eliminar región de prueba (admin)  →  200",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 200 OK', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Estructura JSON uniforme (status = \"success\")', () => pm.expect(j.status).to.eql('success'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/regiones/{{regionId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "regiones",
+                "{{regionId}}"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 200 OK (base de pruebas local)",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:4000/api/regiones/3",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "4000",
+                  "path": [
+                    "api",
+                    "regiones",
+                    "3"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "body": "{\n  \"status\": \"success\",\n  \"message\": \"Región eliminada correctamente\",\n  \"data\": {\n    \"id\": 3\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Eliminar categoría de prueba (admin)  →  200",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 200 OK', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Estructura JSON uniforme (status = \"success\")', () => pm.expect(j.status).to.eql('success'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/categorias/{{categoriaGaleriaId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "categorias",
+                "{{categoriaGaleriaId}}"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 200 OK (base de pruebas local)",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:4000/api/categorias/4",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "4000",
+                  "path": [
+                    "api",
+                    "categorias",
+                    "4"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "body": "{\n  \"status\": \"success\",\n  \"message\": \"Categoría eliminada correctamente\",\n  \"data\": {\n    \"id\": 4\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Cerrar sesión (logout simulado)  →  200",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código 200 OK', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Estructura JSON uniforme (status = \"success\")', () => pm.expect(j.status).to.eql('success'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/logout",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "logout"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 200 OK (base de pruebas local)",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:4000/api/auth/logout",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "4000",
+                  "path": [
+                    "api",
+                    "auth",
+                    "logout"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                }
+              ],
+              "body": "{\n  \"status\": \"success\",\n  \"message\": \"Sesión cerrada. Elimina el token en el cliente\",\n  \"data\": {\n    \"instrucciones\": \"Borra el token guardado en el cliente, por ejemplo: localStorage.removeItem('token'). El token deja de ser aceptado cuando expira.\",\n    \"expira_en\": \"1h\"\n  }\n}"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:4000"
+    },
+    {
+      "key": "correoAdmin",
+      "value": "CAMBIAR_correo_del_admin@correo.com"
+    },
+    {
+      "key": "passwordAdmin",
+      "value": "CAMBIAR_contraseña_del_admin"
+    },
+    {
+      "key": "token",
+      "value": ""
+    },
+    {
+      "key": "tokenAdmin",
+      "value": ""
+    },
+    {
+      "key": "correoPrueba",
+      "value": ""
+    },
+    {
+      "key": "passwordPrueba",
+      "value": ""
+    },
+    {
+      "key": "sufijo",
+      "value": ""
+    },
+    {
+      "key": "usuarioPruebaId",
+      "value": ""
+    },
+    {
+      "key": "categoriaCuriosidadId",
+      "value": ""
+    },
+    {
+      "key": "categoriaGaleriaId",
+      "value": ""
+    },
+    {
+      "key": "regionId",
+      "value": ""
+    },
+    {
+      "key": "curiosidadId",
+      "value": ""
+    },
+    {
+      "key": "fotoId",
+      "value": ""
+    },
+    {
+      "key": "mensajeId",
+      "value": ""
+    }
+  ]
+}

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Prototipo independiente de acceso y administración para la Fan Page Café Hondureño.">
+  <title>Acceso y comunidad | Café Hondureño</title>
+  <link rel="icon" href="imagenes/logo.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/segundo-parcial.css">
+  <script src="js/segundo-parcial.js" defer></script>
+</head>
+<body>
+  <header class="sp-header">
+    <div class="sp-container sp-nav">
+      <div class="sp-brand"><img src="imagenes/logo.svg" alt="" onerror="this.style.display='none'"><span>Café<span class="sp-gold">Hondureño</span></span></div>
+      <span class="sp-nav-label">Acceso y comunidad</span>
+      <a class="sp-button sp-button-outline" href="#acceso">Acceso de usuarios</a>
+    </div>
+  </header>
+
+  <main class="sp-container">
+    <section class="sp-intro">
+      <p class="sp-eyebrow">CONTINUACIÓN DEL PROYECTO · SEGUNDO PARCIAL</p>
+      <h1>Una comunidad que comparte la pasión por nuestro café.</h1>
+      <p>Propuesta de acceso y administración de contenido para la Fan Page de Café Hondureño.</p>
+    </section>
+
+    <section class="sp-section" id="acceso">
+      <div class="sp-section-heading"><span class="sp-eyebrow">TU ESPACIO EN LA COMUNIDAD</span><h2>Acceso de usuarios</h2><p>Prototipo visual de las pantallas de autenticación.</p></div>
+      <div class="sp-auth-grid">
+        <article class="sp-card">
+          <div class="sp-card-icon" aria-hidden="true">☕</div>
+          <h3>Iniciar sesión</h3><p>Ingresa con tu cuenta para continuar.</p>
+          <form class="sp-form" data-demo-form>
+            <label>Correo electrónico<input type="email" placeholder="correo@ejemplo.com" required></label>
+            <label>Contraseña<input type="password" placeholder="Tu contraseña" required></label>
+            <button class="sp-button" type="submit">Ingresar</button>
+            <small>Se envía a POST /api/auth/login y la API devuelve el token JWT.</small>
+          </form>
+        </article>
+        <article class="sp-card" id="registro">
+          <div class="sp-card-icon" aria-hidden="true">✦</div>
+          <h3>Crear cuenta</h3><p>Forma parte de la comunidad del café hondureño.</p>
+          <form class="sp-form" data-demo-form>
+            <label>Nombre completo<input type="text" placeholder="Tu nombre" required></label>
+            <label>Correo electrónico<input type="email" placeholder="correo@ejemplo.com" required></label>
+            <label>Contraseña<input type="password" placeholder="Crea una contraseña" required></label>
+            <button class="sp-button" type="submit">Registrarme</button>
+            <small>Se envía a POST /api/auth/registro. La contraseña se guarda encriptada con bcrypt.</small>
+          </form>
+        </article>
+      </div>
+    </section>
+
+    <section class="sp-section">
+      <div class="sp-section-heading"><span class="sp-eyebrow">VISTA PROPUESTA</span><h2>Administración de contenido</h2><p>Panel de referencia para gestionar las curiosidades, galería, regiones y mensajes contemplados en la base de datos.</p></div>
+      <div class="sp-admin">
+        <aside class="sp-sidebar">
+          <div class="sp-sidebar-brand">☕ <span>Café Hondureño</span></div>
+          <a class="selected" href="#resumen">Resumen</a><a href="#curiosidades">Curiosidades</a><a href="#galeria">Galería</a><a href="#regiones">Regiones</a><a href="#mensajes">Mensajes</a>
+          <p class="sp-sidebar-note">Vista de prototipo</p>
+        </aside>
+        <div class="sp-admin-content" id="resumen">
+          <div class="sp-admin-top"><div><span class="sp-eyebrow">PANEL DE CONTENIDO</span><h3>Gestión de publicaciones</h3></div><span class="sp-status">Prototipo</span></div>
+          <div class="sp-stats">
+            <article><b>Curiosidades</b><strong>—</strong><small>Información de contenido</small></article>
+            <article><b>Imágenes</b><strong>—</strong><small>Contenido de galería</small></article>
+            <article><b>Mensajes</b><strong>—</strong><small>Mensajes recibidos</small></article>
+          </div>
+          <div class="sp-table-wrap"><table><thead><tr><th>Contenido</th><th>Categoría</th><th>Región</th><th>Acciones</th></tr></thead><tbody><tr id="curiosidades"><td>Ejemplo de curiosidad</td><td>Historia</td><td>—</td><td><span class="sp-action">Ver</span><span class="sp-action">Editar</span></td></tr><tr id="galeria"><td>Ejemplo de publicación</td><td>Cultura</td><td>Marcala</td><td><span class="sp-action">Ver</span><span class="sp-action">Editar</span></td></tr></tbody></table></div>
+          <p class="sp-note">Los registros se obtienen de GET /api/curiosidades, GET /api/galeria, GET /api/regiones y GET /api/contacto.</p>
+          <div class="sp-module-tags"><span id="regiones">Regiones cafetaleras</span><span id="mensajes">Mensajes de contacto</span><span>Categorías</span></div>
+        </div>
+      </div>
+    </section>
+  </main>
+  <footer class="sp-footer"><div class="sp-container"><strong>☕ Café Hondureño</strong><p>Prototipo independiente · Programación Web II</p></div></footer>
+</body>
+</html>

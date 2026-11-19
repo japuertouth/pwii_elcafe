@@ -1,0 +1,8 @@
+# Archivos que no se suben a Vercel (no forman parte del sitio ni de la API)
+.env
+.env.*
+!.env.example
+backend/tests/
+backend/scripts/
+docs/
+node_modules/

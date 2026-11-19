@@ -1,0 +1,12 @@
+Imágenes descargadas de Wikimedia Commons (https://commons.wikimedia.org).
+Revisa la licencia y el autor de cada una en su página de Commons.
+
+cerezas-cafe.jpg      -> File:Coffee_cherries_of_varying_ripeness,_on_a_tree_in_Colombia_(by_Brian_Smith).jpg
+cereza-arabica.jpg    -> File:Coffee_arabica_cherry.jpg
+seleccion-granos.jpg  -> File:Coffeebeansorting.jpg  (Category: Coffee in Honduras)
+tamal-y-cafe.jpg      -> File:Tamal_de_Honduras_y_café.jpg
+cafe-tostado.jpg      -> File:Roasted_coffee_beans.jpg
+
+extra/ (no se usan en index.html, útiles para la galería):
+copan-honduras.jpg    -> File:Copan_Honduras_banner.jpg
+cultivo-cafe.jpg      -> File:Cultivo_del_Cafe.jpg  (Category: Coffee in Honduras)

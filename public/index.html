@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Café Hondureño | El oro de nuestras montañas</title>
+  <meta name="description" content="Fan page del café hondureño: regiones, historia, datos y cultura del café de Honduras.">
+  <meta name="theme-color" content="#1f3b2d">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <link rel="icon" href="/imagenes/logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/css/estilos.css">
+  <script src="/js/tema-inicial.js"></script>
+  <script src="/js/comun.js" defer></script>
+  <script src="/js/inicio.js" defer></script>
+</head>
+<body data-pagina="inicio">
+  <a class="saltar" href="#contenido">Saltar al contenido</a>
+
+  <header class="encabezado">
+    <div class="contenedor">
+      <a class="marca" href="/"><img src="/imagenes/logo.svg" alt="" width="34" height="34">Café Hondureño</a>
+      <nav id="navegacion" class="navegacion" aria-label="Principal">
+        <ul class="menu">
+          <li><a href="/" aria-current="page">Inicio</a></li>
+          <li><a href="/elcafe">El café</a></li>
+          <li><a href="/galeria">Galería</a></li>
+          <li><a href="/curiosidades">Curiosidades</a></li>
+          <li><a href="/contacto">Contacto</a></li>
+          <li><a href="/cuenta" class="menu__cuenta" id="enlaceCuenta">Mi cuenta</a></li>
+        </ul>
+      </nav>
+      <div class="acciones">
+        <button class="boton-icono" id="botonTema" type="button" aria-pressed="false" aria-label="Cambiar a tema oscuro"><svg class="icono-luna" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg><svg class="icono-sol" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg></button>
+        <button class="boton-icono boton-menu" id="botonMenu" type="button" aria-expanded="false" aria-controls="navegacion" aria-label="Abrir menú"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+      </div>
+    </div>
+  </header>
+
+  <main id="contenido" tabindex="-1">
+
+    <section class="portada" aria-labelledby="titulo-portada">
+      <div class="contenedor">
+        <div>
+          <h1 id="titulo-portada">El oro de nuestras montañas</h1>
+          <p class="entrada" id="saludo">Bienvenido, amante del café.</p>
+          <p class="entrada">Honduras es el mayor productor de café de Centroamérica y uno de los cinco más grandes del mundo. Detrás de cada taza hay más de 120,000 familias productoras y seis regiones con sabores propios.</p>
+          <div class="botones">
+            <a class="boton" href="/elcafe">Conoce el café</a>
+            <a class="boton boton--contorno" href="#regiones">Ver las regiones</a>
+          </div>
+        </div>
+        <div class="taza-zona">
+          <button class="taza" id="taza" type="button" aria-describedby="mensajeTaza" aria-label="Taza de café: toca para dar un sorbo">
+            <span class="humo" id="humo" aria-hidden="true"><span></span><span></span><span></span></span>
+            <span class="taza__cuerpo" aria-hidden="true"><span class="taza__liquido" id="liquido"></span></span>
+            <span class="taza__asa" aria-hidden="true"></span>
+            <span class="taza__plato" aria-hidden="true"></span>
+          </button>
+          <p class="taza__mensaje" id="mensajeTaza" aria-live="polite">Toca la taza para dar un sorbo.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="cifras" aria-label="El café hondureño en cifras">
+      <div class="cifra"><p class="cifra__valor">5.º</p><p>productor de café del mundo</p></div>
+      <div class="cifra"><p class="cifra__valor">120,000</p><p>familias productoras, 90 % pequeños caficultores</p></div>
+      <div class="cifra"><p class="cifra__valor">6.1 M</p><p>quintales exportados en la cosecha 2024-2025</p></div>
+      <div class="cifra"><p class="cifra__valor">US$2,100 M</p><p>en divisas generadas en 2024-2025</p></div>
+    </section>
+
+    <section class="seccion" aria-labelledby="titulo-sobre">
+      <div class="contenedor dos-columnas">
+        <figure class="foto">
+          <img src="/imagenes/cerezas-cafe.jpg" alt="Cerezas de café en distintos grados de maduración en la planta" width="960" height="720" loading="lazy">
+          <figcaption>Cerezas de café. Foto: Brian Smith, Wikimedia Commons.</figcaption>
+        </figure>
+        <div>
+          <h2 id="titulo-sobre">Mucho más que una bebida</h2>
+          <p>El café es la <strong>principal fuente de divisas por exportación</strong> de Honduras. Durante la cosecha genera cerca de <strong>un millón de empleos</strong> en el corte, el beneficiado y el transporte del grano.</p>
+          <p>Casi todo el café hondureño es <em>Coffea arabica</em>, cultivado bajo sombra en zonas de montaña. La altura, el clima y el suelo de cada región le dan perfiles de taza que hoy compiten en los mercados de cafés especiales.</p>
+          <div id="sobreExtra" hidden>
+            <p>El <strong>Instituto Hondureño del Café (IHCAFE)</strong> acompaña a los productores con investigación, asistencia técnica y promoción en el mundo. Cada <strong>1 de octubre</strong> arranca la nueva cosecha y se celebra el Día Nacional de la Caficultura.</p>
+            <p>Entre los retos del sector están la roya y otras plagas, el cambio climático, el acceso a crédito para pequeños productores y el estado de los caminos rurales.</p>
+          </div>
+          <div class="botones">
+            <button class="boton boton--contorno" id="botonMas" type="button" aria-expanded="false" aria-controls="sobreExtra">Leer más</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="seccion seccion--alterna" id="regiones" aria-labelledby="titulo-regiones">
+      <div class="contenedor">
+        <div class="cabeza-seccion">
+          <h2 id="titulo-regiones">Las seis regiones del café</h2>
+          <p class="entrada">El IHCAFE divide el país en seis regiones productoras. Elige una para conocer su perfil de taza.</p>
+        </div>
+        <div class="regiones">
+          <ul class="regiones__lista" id="listaRegiones" aria-label="Regiones cafetaleras"></ul>
+          <article class="region" id="detalleRegion" aria-live="polite"></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="seccion" aria-labelledby="titulo-historia">
+      <div class="contenedor">
+        <h2 id="titulo-historia" class="cabeza-seccion">Un poco de historia</h2>
+        <ol class="linea-tiempo">
+          <li class="hito"><span class="hito__fecha">Finales del s. XVIII</span><p>Llegan las primeras plantas de café a Honduras, traídas desde otras colonias de la región.</p></li>
+          <li class="hito"><span class="hito__fecha">1970</span><p>Se crea el Instituto Hondureño del Café (IHCAFE) para impulsar y organizar la caficultura nacional.</p></li>
+          <li class="hito"><span class="hito__fecha">2005</span><p>El café de Marcala obtiene la primera Denominación de Origen para café de Centroamérica.</p></li>
+          <li class="hito"><span class="hito__fecha">2011</span><p>Honduras supera a Guatemala y se convierte en el mayor productor de café de Centroamérica.</p></li>
+          <li class="hito"><span class="hito__fecha">2024-2025</span><p>Se exportan 6.1 millones de quintales y se superan los US$2,100 millones en divisas, una cosecha histórica.</p></li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="seccion seccion--alterna" aria-label="Prepara tu taza y dato curioso">
+      <div class="contenedor dos-columnas">
+        <form class="calculadora" id="calculadora" aria-labelledby="titulo-calculadora">
+          <div>
+            <h2 id="titulo-calculadora">Prepara tu taza</h2>
+            <p>Para café filtrado se recomienda <strong>1 gramo de café por cada 16 ml de agua</strong>. Elige cuántas tazas quieres y la intensidad.</p>
+          </div>
+          <div class="campo">
+            <label for="rangoTazas">Tazas: <output id="numTazas" for="rangoTazas">2</output></label>
+            <input type="range" id="rangoTazas" min="1" max="10" value="2">
+          </div>
+          <fieldset>
+            <legend>Intensidad</legend>
+            <label class="opcion"><input type="radio" name="intensidad" value="18"><span>Suave</span></label>
+            <label class="opcion"><input type="radio" name="intensidad" value="16" checked><span>Balanceado</span></label>
+            <label class="opcion"><input type="radio" name="intensidad" value="14"><span>Intenso</span></label>
+          </fieldset>
+          <div class="resultado" aria-live="polite">
+            <div><output id="gramos">30</output> gramos de café</div>
+            <div><output id="mililitros">480</output> ml de agua</div>
+          </div>
+        </form>
+        <div class="dato-curioso" aria-labelledby="titulo-dato">
+          <h2 id="titulo-dato">¿Sabías que…?</h2>
+          <blockquote id="textoDato" aria-live="polite">Honduras es el mayor productor de café de Centroamérica.</blockquote>
+          <div class="botones">
+            <button class="boton" id="botonDato" type="button">Otro dato</button>
+            <a class="boton boton--contorno" href="/curiosidades">Ver todas las curiosidades</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="seccion" aria-labelledby="titulo-explora">
+      <div class="contenedor">
+        <h2 id="titulo-explora" class="cabeza-seccion">Explora la fan page</h2>
+        <div class="explora">
+          <a href="/elcafe"><img src="/imagenes/cereza-arabica.jpg" alt="" width="960" height="720" loading="lazy"><div><h3>El café</h3><p>Origen, variedades, tueste y formas de prepararlo.</p></div></a>
+          <a href="/galeria"><img src="/imagenes/seleccion-granos.jpg" alt="" width="462" height="326" loading="lazy"><div><h3>Galería</h3><p>Fincas, cosecha, granos y costumbres.</p></div></a>
+          <a href="/curiosidades"><img src="/imagenes/tamal-y-cafe.jpg" alt="" width="960" height="540" loading="lazy"><div><h3>Curiosidades</h3><p>Datos, mitos y tradiciones del café.</p></div></a>
+          <a href="/contacto"><img src="/imagenes/cafe-tostado.jpg" alt="" width="960" height="720" loading="lazy"><div><h3>Contacto</h3><p>Escríbenos y comparte tu amor por el café.</p></div></a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="pie">
+    <div class="contenedor">
+      <div class="pie__columnas">
+        <div>
+          <a class="marca" href="/"><img src="/imagenes/logo.svg" alt="" width="34" height="34">Café Hondureño</a>
+          <p>Una fan page sobre el café de Honduras: sus regiones, su historia y la gente que lo cultiva.</p>
+        </div>
+        <div>
+          <h2>Equipo</h2>
+          <ul>
+            <li>Josue Alejandro Puerto Ulloa</li>
+            <li>Eduardo Alberto Meza</li>
+            <li>Nathaly Melissa Aguilar Gómez</li>
+            <li>Josse Armando Galeano</li>
+            <li>José Daniel Muñoz Cruz</li>
+          </ul>
+        </div>
+        <div>
+          <h2>Fuentes</h2>
+          <ul>
+            <li><a href="https://www.ihcafe.hn" rel="noopener noreferrer" target="_blank">Instituto Hondureño del Café (IHCAFE)</a></li>
+            <li><a href="https://www.laprensa.hn/economia/honduras-inicia-cosecha-de-cafe-2025-2026-con-meta-de-exportar-65-millones-de-quintales-CJ27599748" rel="noopener noreferrer" target="_blank">La Prensa: cosecha 2025-2026</a></li>
+            <li><a href="https://www.abc.com.py/internacionales/2025/07/14/las-exportaciones-de-cafe-hondureno-crecen-un-3-en-la-cosecha-2024-2025/" rel="noopener noreferrer" target="_blank">EFE / ABC: exportaciones 2024-2025</a></li>
+            <li><a href="https://perfectdailygrind.com/es/2024/07/12/recorrido-zonas-productoras-cafe-honduras/" rel="noopener noreferrer" target="_blank">Perfect Daily Grind: zonas productoras</a></li>
+            <li><a href="https://commons.wikimedia.org/wiki/Category:Coffee_in_Honduras" rel="noopener noreferrer" target="_blank">Fotografías: Wikimedia Commons</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="pie__legal">
+        <p>© <span data-anio>2026</span> Grupo 2, Programación Web II</p>
+        <p>Hecho en Honduras, con café.</p>
+      </div>
+    </div>
+  </footer>
+
+  <button class="arriba" id="botonArriba" type="button" aria-label="Volver arriba">↑</button>
+</body>
+</html>
