@@ -766,3 +766,65 @@ a:hover { text-decoration-thickness: 2px; }
 /* ---------- 13. Ajustes finos ---------- */
 .ficha .etiqueta-dato { justify-self: start; }
 .pie__legal p { margin: 0; }
+
+/* ---------- 14. Portadas con foto de paisaje cafetalero ---------- */
+.portada--foto {
+  position: relative;
+  isolation: isolate;
+  background-color: var(--bosque);
+  background-size: cover;
+  background-position: center;
+  min-height: clamp(26rem, 62vh, 40rem);
+  display: flex;
+  align-items: center;
+  padding-bottom: clamp(3.5rem, 7vw, 5rem);
+}
+.portada--foto > .contenedor { width: min(100% - 2.5rem, var(--ancho)); }
+/* Velo verde: más oscuro a la izquierda (donde va el texto) para que se lea bien */
+.portada--foto::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(90deg, rgb(14 30 22 / 0.86) 0%, rgb(14 30 22 / 0.6) 45%, rgb(14 30 22 / 0.12) 100%),
+    linear-gradient(0deg, rgb(14 30 22 / 0.5) 0%, transparent 30%);
+}
+:root[data-tema="oscuro"] .portada--foto::before {
+  background:
+    linear-gradient(90deg, rgb(8 14 11 / 0.9) 0%, rgb(8 14 11 / 0.7) 45%, rgb(8 14 11 / 0.3) 100%),
+    linear-gradient(0deg, rgb(8 14 11 / 0.55) 0%, transparent 30%);
+}
+.portada--foto h1 { text-shadow: 0 2px 18px rgb(0 0 0 / 0.35); }
+.portada--foto .entrada { color: rgb(244 247 241 / 0.92); text-shadow: 0 1px 8px rgb(0 0 0 / 0.4); }
+.portada--foto .sello { background: rgb(14 30 22 / 0.55); backdrop-filter: blur(3px); }
+.portada--foto .destacado { background: rgb(14 30 22 / 0.6); backdrop-filter: blur(4px); }
+
+.portada--inicio { background-image: url("../imagenes/portadas/portada-inicio.jpg"); }
+.portada--elcafe { background-image: url("../imagenes/portadas/portada-elcafe.jpg"); }
+.portada--galeria { background-image: url("../imagenes/portadas/portada-galeria.jpg"); }
+.portada--curiosidades { background-image: url("../imagenes/portadas/portada-curiosidades.jpg"); }
+.portada--contacto { background-image: url("../imagenes/portadas/portada-contacto.jpg"); }
+.portada--cuenta { background-image: url("../imagenes/portadas/portada-cuenta.jpg"); }
+.portada--404 { background-image: url("../imagenes/portadas/portada-404.jpg"); }
+
+.portada__credito {
+  position: absolute;
+  right: 1rem;
+  bottom: 0.6rem;
+  max-width: min(36rem, calc(100% - 2rem));
+  margin: 0;
+  font-size: 0.75rem;
+  line-height: 1.35;
+  text-align: right;
+  color: rgb(244 247 241 / 0.75);
+}
+.portada .portada__credito a, :root[data-tema] .portada .portada__credito a { color: inherit; }
+
+@media (max-width: 760px) {
+  .portada--foto { min-height: 0; }
+  .portada--foto::before {
+    background: linear-gradient(180deg, rgb(14 30 22 / 0.72) 0%, rgb(14 30 22 / 0.85) 100%);
+  }
+  .portada__credito { left: 1rem; text-align: left; }
+}

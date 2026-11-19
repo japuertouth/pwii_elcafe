@@ -10,3 +10,12 @@ cafe-tostado.jpg      -> File:Roasted_coffee_beans.jpg
 extra/ (no se usan en index.html, útiles para la galería):
 copan-honduras.jpg    -> File:Copan_Honduras_banner.jpg
 cultivo-cafe.jpg      -> File:Cultivo_del_Cafe.jpg  (Category: Coffee in Honduras)
+
+portadas/ (fotos de fondo de la portada de cada página, recortadas a 1600x900):
+portada-inicio.jpg        -> File:Coffee_plantations_on_the_Camino_de_Costa_Rica.jpg — Pigment-Ink, CC BY-SA 4.0
+portada-elcafe.jpg        -> File:Costa_Rica_-_Poás_06.JPG — Wayne77, CC BY-SA 4.0
+portada-galeria.jpg       -> File:El_Águila_(4),_Valle,_Colombia.JPG — Hoako, CC BY-SA 3.0
+portada-curiosidades.jpg  -> File:El_Águila_(5),_Valle,_Colombia.JPG — Hoako, CC BY-SA 3.0
+portada-contacto.jpg      -> File:Countryside_near_Palma_Real,_a_village_(aldea)_in_the_municipality_of_Proteccion.jpg — Catrachos, CC BY-SA 3.0 (Santa Bárbara, Honduras)
+portada-cuenta.jpg        -> File:Coffee_shadow_trees_costa_rica.jpg — DirkvdM, CC BY 1.0
+portada-404.jpg           -> File:El_Águila_(26),_Valle,_Colombia.JPG — Hoako, CC BY-SA 3.0
