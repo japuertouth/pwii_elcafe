@@ -90,8 +90,9 @@
   function mostrar(i) {
     actual = (i + visibles.length) % visibles.length;
     var f = visibles[actual];
-    document.getElementById('visorImagen').src = f.src;
-    document.getElementById('visorImagen').alt = f.titulo;
+    var visorImagen = document.getElementById('visorImagen');
+    visorImagen.alt = f.titulo;
+    visorImagen.src = f.src;
     document.getElementById('visorTitulo').textContent = f.titulo;
     document.getElementById('visorDescripcion').textContent = f.descripcion || '';
     document.getElementById('visorTema').textContent = TEMAS[f.tema] || f.temaNombre || 'Café';
