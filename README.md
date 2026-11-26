@@ -1,4 +1,4 @@
-# Café Hondureño · Fan page + API (Grupo 2)
+# Café Hondureño · Fan page + API (Grupo 6)
 
 Proyecto unificado de Programación Web II: la **fan page** (HTML, CSS y JavaScript) y la **API REST** (Node.js, Express 5, Sequelize, Azure SQL y JWT) viven en un solo repositorio y se despliegan juntas en **Vercel**.
 
