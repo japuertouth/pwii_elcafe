@@ -1,0 +1,82 @@
+NATHALY MELISSA AGUILAR GOMEZ
+
+SOLICITUD DEL USUARIO:
+Ya tenemos la API RESTful funcionando y el cliente HTTP base en public/js/comun.js.
+
+Mi tarea es desarrollar toda la lógica del Panel de Administración (public/js/admin.js) conectado a public/admin.html para gestionar la base de datos directamente desde la interfaz web sin recargar la página. Necesito:
+
+1. Proteger la vista al cargar el DOM verificando el token JWT y el rol de administrador; si la API responde 401 o 403, expulsar al usuario hacia cuenta.html.
+2. Implementar el CRUD completo (Crear, Leer, Actualizar y Eliminar) manipulando el DOM dinámicamente para las entidades principales: Curiosidades (incluyendo moderación: aprobar/rechazar), Regiones, Categorías, Galería, Mensajes de Contacto y Usuarios.
+3. Mostrar indicadores de carga en las tablas mientras responden los fetch(), botones de acción con estados deshabilitados durante peticiones POST/PUT/DELETE, y mensajes claros de éxito o error.
+
+RESPUESTA DE LA IA:
+Para construir un panel administrativo modular en JavaScript Vanilla que refleje todos los cambios en tiempo real sin recargar la página, estructura public/js/admin.js de la siguiente manera:
+
+1. Inicialización y Protección de Vista:
+
+  document.addEventListener('DOMContentLoaded', async () => {
+    verificarAccesoPrivado(true); // Verifica token y rol admin en localStorage
+    await cargarDatosPanel();
+  });
+
+Todas las peticiones dentro de admin.js utilizan solicitudApi(), garantizando el envío de Authorization: Bearer <token> y la redirección automática si el servidor devuelve 401.
+
+2. Operaciones CRUD Dinámicas sobre el DOM:
+- Leer (GET): Ejecuta en paralelo (Promise.all) la carga de /api/curiosidades, /api/regiones, /api/categorias, /api/galeria, /api/contacto y /api/usuarios, actualizando los contadores de resumen y renderizando las filas (<tr>) de cada tabla.
+- Crear (POST) y Editar (PUT / PATCH): Utiliza un formulario o sección de edición donde, al pulsar "Editar" en una fila, se precargan los datos de ese registro en los inputs y se guarda su id en un atributo data-edit-id. Al hacer submit, si existe data-edit-id ejecuta PUT /api/<entidad>/:id; si no, ejecuta POST /api/<entidad>. Tras recibir confirmación, vuelve a renderizar la tabla correspondiente.
+- Moderación Rápida (PATCH): Añade botones directos de Aprobar y Rechazar en la tabla de curiosidades pendientes que actualizan el estado en la base de datos y refrescan la fila al instante.
+- Eliminar (DELETE): Solicita confirmación al administrador, envía DELETE /api/<entidad>/:id, muestra un indicador de procesamiento en el botón y elimina el elemento del DOM al confirmar el borrado en la base de datos.
+
+
+SOLICITUD DEL USUARIO:
+Antes de desplegar la aplicación integrada, necesito asegurar que la comunicación entre los endpoints, la validación de JWT, los permisos por rol y las operaciones CRUD funcionen sin regresiones.
+
+Ayúdame a estructurar una serie de pruebas de integración en backend/tests/integracion.test.js (y revisar backend/tests/curiosidades.test.js) que valide:
+1. Flujo completo de registro e inicio de sesión devolviendo un token JWT válido.
+2. Bloqueo con código 401 al intentar crear, editar o eliminar registros sin enviar cabecera Authorization: Bearer <token>.
+3. Bloqueo con código 403 cuando un usuario con rol normal intenta acceder a rutas exclusivas de administrador.
+4. Ciclo CRUD completo (Crear -> Leer -> Actualizar -> Eliminar) sobre las entidades principales verificando los códigos HTTP (200, 201, 400, 404).
+
+RESPUESTA DE LA IA:
+Para validar de extremo a extremo el comportamiento de la API frente a las peticiones que realizará el frontend, organiza las pruebas de integración siguiendo este flujo secuencial:
+
+1. Preparación del Entorno (backend/tests/helpers/baseDePruebas.js):
+Inicializa la conexión de prueba y limpia/aisla los registros creados durante los tests para no contaminar los datos reales de producción.
+
+2. Casos de Prueba Críticos (backend/tests/integracion.test.js):
+- Autenticación: Envía peticiones POST /api/auth/registro y POST /api/auth/login, comprobando que la respuesta sea 200/201 y contenga una cadena token con formato JWT válido.
+- Seguridad y Roles: Realiza peticiones POST y DELETE hacia /api/curiosidades y /api/regiones sin token (esperando 401), con un token manipulado (esperando 401) y con un token de usuario sin privilegios de administrador en rutas restringidas (esperando 403).
+- Ciclo CRUD Completo: Ejecuta con token de administrador la creación de un registro (201), su consulta posterior en el listado (200), su modificación (200) y su eliminación final (200), verificando después que una consulta al ID eliminado devuelva 404.
+
+
+SOLICITUD DEL USUARIO:
+Ahora solo necesito unificar el frontend y el backend para desplegar el proyecto completo en Vercel conectado a nuestra base de datos en Azure SQL, y redactar la documentación final de entrega.
+
+Ayúdame con esto:
+1. Configurar el punto de entrada serverless en api/index.js y las reglas de enrutamiento en vercel.json para que Vercel sirva los archivos estáticos del frontend y redirija todas las llamadas /api/* hacia Express bajo el mismo dominio.
+2. Crear un script de verificación (backend/scripts/verificar-azure.js) para comprobar la conexión y tablas en Azure SQL antes del despliegue.
+3. Redactar un README.md profesional en la raíz del proyecto con la arquitectura del sistema, instrucciones paso a paso para levantar el proyecto en local, explicación de las variables de entorno (.env.example), endpoints principales y credenciales de prueba.
+
+RESPUESTA DE LA IA:
+Para unificar ambos componentes en un despliegue listo para producción y documentarlo de forma clara:
+
+1. Adaptador Serverless y Enrutamiento (api/index.js y vercel.json):
+- En backend/src/app.js, exporta la instancia app de Express sin llamar a app.listen() cuando se ejecuta en entorno serverless, e impórtala en api/index.js.
+- Configura vercel.json con rewrites para enrutar cualquier solicitud /api/(.*) hacia /api/index.js y servir las vistas HTML de public/, configurando además la ruta de fallback para public/404.html:
+
+  {
+    "version": 2,
+    "rewrites": [
+      { "source": "/api/(.*)", "destination": "/api/index.js" },
+      { "source": "/(.*)", "destination": "/public/$1" }
+    ]
+  }
+
+2. Verificación de Base de Datos (backend/scripts/verificar-azure.js):
+Implementa un script CLI que se conecte a Azure SQL usando las variables de entorno, verifique que todas las tablas requeridas (Usuarios, Roles, Curiosidades, Regiones, Categorias, Galeria, MensajesContacto) existan y muestre un resumen del estado de salud antes de publicar.
+
+3. Documentación Final (README.md):
+Estructura el documento en la raíz detallando:
+- Descripción general y stack tecnológico utilizado (Frontend Vanilla, Node.js/Express, JWT, Azure SQL, Vercel).
+- Guía de instalación local (npm install, configuración de .env a partir de .env.example, ejecución de migraciones y arranque del servidor).
+- Puertos locales, rutas de acceso al frontend/API, comandos para correr la suite de pruebas y credenciales de prueba para evaluar el rol administrador.

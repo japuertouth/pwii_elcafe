@@ -1,0 +1,114 @@
+BITÁCORA DE USO DE INTELIGENCIA ARTIFICIAL
+Proyecto: Café Hondureño
+Integrante: Josue Alejandro Puerto
+
+Estamos en la tercera fase de nuestro proyecto Full-Stack "Café Hondureño". Ya tenemos lista la fan page estática y el backend.
+
+En esta fase necesitamos conectar la capa de comunicación y autenticación del cliente con el servidor. 
+Necesito ayuda con lo siguiente:
+*Revisar y ajustar la configuración de CORS y cabeceras de seguridad en backend/src/app.js y backend/config/cabeceras.js para permitir peticiones asíncronas desde nuestro frontend sin errores de origen cruzado.
+*Construir un cliente HTTP reutilizable dentro de public/js/comun.js usando fetch() con async/await.
+*Asegurar que toda petición que envíe datos incluya Content-Type: application/json y serialice el cuerpo con JSON.stringify().
+*Implementar validación explícita de respuestas HTTP con if (!res.ok) para capturar errores 400, 401, 403, 404 y 500, mostrando mensajes claros al usuario.
+*Configurar la intercepción global de estados 401 Unauthorized: si el token JWT expiró o es inválido, eliminar automáticamente las credenciales de localStorage y redirigir al usuario hacia cuenta.html.
+
+
+RESPUESTA DE LA IA:
+Para centralizar la comunicación entre el frontend y la API de Express manteniendo una experiencia de usuario robusta y segura, implementa la siguiente arquitectura:
+
+1. Ajuste de CORS en el Backend (backend/src/app.js):
+Configura el middleware cors() antes de definir las rutas /api:
+
+  app.use(cors({
+    origin: process.env.FRONTEND_URL || '*',
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+  }));
+
+Esto permite que el navegador realice peticiones preflight (OPTIONS) y envíe el encabezado Authorization sin bloqueos.
+
+2. Cliente HTTP Centralizado (public/js/comun.js):
+Crea una función asíncrona solicitudApi(endpoint, opciones = {}) que encapsule la lógica de fetch, la inyección del token y el manejo de errores HTTP:
+
+  async function solicitudApi(endpoint, opciones = {}) {
+    const token = localStorage.getItem('token');
+    const config = {
+      ...opciones,
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...(opciones.headers || {})
+      }
+    };
+
+    if (config.body && typeof config.body === 'object') {
+      config.body = JSON.stringify(config.body);
+    }
+
+    const res = await fetch(endpoint, config);
+
+    if (res.status === 401) {
+      localStorage.removeItem('token');
+      localStorage.removeItem('usuario');
+      if (!window.location.pathname.endsWith('cuenta.html')) {
+        window.location.href = '/cuenta.html?sesion=expirada';
+      }
+      throw new Error('Tu sesión ha expirado. Inicia sesión nuevamente.');
+    }
+
+    const datos = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      throw new Error(datos.mensaje || datos.error || `Error del servidor (${res.status})`);
+    }
+
+    return datos;
+  }
+
+3. Actualización Dinámica de la Barra de Navegación (public/js/comun.js):
+Al cargar cualquier página (DOMContentLoaded), verifica si existe localStorage.getItem('token'). Si el usuario está autenticado, muestra su nombre, habilita el enlace al panel de administración (si su rol es admin) y renderiza el botón funcional de Cerrar Sesión que ejecuta localStorage.removeItem('token'), limpia los datos de sesión y redirige a cuenta.html.
+
+
+SOLICITUD DEL USUARIO
+Ahora necesito conectar las vistas de acceso (public/cuenta.html y public/restablecer.html) con sus respectivos archivos JavaScript (public/js/cuenta.js y public/js/restablecer.js) y con los endpoints /api/auth/* del backend.
+
+Específicamente necesito:
+*Conectar el formulario de Registro (Sign Up) (POST /api/auth/registro) y el de Inicio de Sesión (Login) (POST /api/auth/login) usando la función solicitudApi().
+*Al recibir una respuesta exitosa del login, guardar el token JWT y los datos básicos del usuario en localStorage, mostrar un mensaje de bienvenida y redirigir automáticamente a admin.html (si es administrador) o a curiosidades.html (si es usuario estándar).
+* Implementar indicadores visuales de carga (deshabilitar el botón y cambiar el texto a "Procesando...") mientras responde el servidor para evitar envíos duplicados.
+* Conectar el flujo de recuperación de contraseña en public/js/restablecer.js (POST /api/auth/solicitar-restablecimiento y POST /api/auth/restablecer-password).
+* Crear una función guardia protegerVistaPrivada() en comun.js para bloquear el acceso directo a vistas privadas si no existe token en localStorage.
+
+RESPUESTA DE LA IA:
+Aquí tienes la integración completa del flujo de autenticación en el cliente:
+
+1. Manejo de Formularios de Login y Registro (public/js/cuenta.js):
+- Intercepta el evento submit con e.preventDefault().
+- Activa el estado de carga (boton.disabled = true; boton.textContent = 'Verificando...') dentro de un bloque try / catch / finally.
+- En el try, envía los datos del formulario mediante await solicitudApi('/api/auth/login', { method: 'POST', body: { correo, password } }).
+- Al recibir el token, guarda localStorage.setItem('token', respuesta.token) y localStorage.setItem('usuario', JSON.stringify(respuesta.usuario)).
+- En el catch(err), muestra el mensaje de error devuelto por la API dentro de un contenedor de alerta accesible (role="alert") sin recargar la página.
+
+2. Guardia de Protección de Vistas (public/js/comun.js):
+- Expone verificarAccesoPrivado(requiereAdmin = false): si !localStorage.getItem('token'), redirige inmediatamente con window.location.replace('/cuenta.html'). Si requiereAdmin es true y el rol almacenado no es administrador, redirige a /index.html. La validación real de seguridad se mantiene respaldada en cada petición por auth.middleware.js y rol.middleware.js en Express.
+
+3. Restablecimiento de Contraseña (public/js/restablecer.js):
+- Lee el parámetro ?token=... de la URL con URLSearchParams. Si existe, muestra el formulario para ingresar la nueva contraseña y hace POST al endpoint de confirmación; si no existe, muestra el formulario para solicitar el envío del correo de recuperación.
+
+
+SOLICITUD DEL USUARIO:
+Para completar mi parte, necesito conectar las tres secciones públicas interactivas con la base de datos en azure a través de la API sin recargar la página:
+* En public/js/curiosidades.js: cargar dinámicamente las curiosidades aprobadas (GET /api/curiosidades), permitir filtrarlas por categoría o región manipulando el DOM, y habilitar el formulario para que los usuarios autenticados envíen nuevas curiosidades (POST /api/curiosidades) adjuntando su token JWT.
+* En public/js/galeria.js: obtener las fotografías desde GET /api/galeria, renderizar las tarjetas dinámicamente con carga diferida (loading="lazy") y mostrar estados de carga/vacío.
+* En public/js/contacto.js: conectar el formulario de contacto con POST /api/contacto, validando campos en cliente, serializando en JSON y mostrando confirmación visual inmediata al enviar.
+
+RESPUESTA DE LA IA:
+Para renderizar el contenido dinámicamente manteniendo el diseño original de la fan page y protegiendo el DOM contra inyección HTML:
+
+1. Curiosidades Dinámicas y Envío Comunitario (public/js/curiosidades.js):
+- Muestra un mensaje de "Cargando curiosidades..." mientras se resuelve await solicitudApi('/api/curiosidades').
+- Construye cada tarjeta utilizando document.createElement y textContent (en lugar de concatenar HTML sin sanitizar) para inyectar título, descripción, región cafetalera y categoría.
+- Verifica si el usuario tiene sesión activa: si hay token, muestra el formulario de "Aportar una curiosidad" y envía el POST con Authorization: Bearer <token>, informando que quedará en estado pendiente de moderación; si no hay sesión, muestra un enlace invitando a iniciar sesión en cuenta.html.
+
+2. Galería y Formulario de Contacto (public/js/galeria.js y public/js/contacto.js):
+- En galeria.js, limpia el contenedor previo e inserta dinámicamente las figuras (<figure>) con su imagen, descripción y créditos provenientes de Azure SQL.
+- En contacto.js, captura los datos del formulario, serializa con JSON.stringify(), maneja posibles errores de validación 400 o de límite de peticiones 429 (rateLimit.middleware.js) y limpia los inputs (form.reset()) tras recibir respuesta exitosa 201.
